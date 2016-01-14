@@ -1,5 +1,6 @@
 ﻿using Assignment1;
 using Assignment2;
+using Assignment3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,44 @@ namespace CSharp
     {
       //TestAssignment1();
       //TestAssignment2(new Car(), new Truck(), new Enterprise());
-      TestAssignment2Advanced(new Node<Vehicle>(new Car(), new Node<Vehicle>(new Truck(), new Node<Vehicle>(new Enterprise(), new Empty<Vehicle>()))));
+      //TestAssignment2Advanced(new Node<Vehicle>(new Car(), new Node<Vehicle>(new Truck(), new Node<Vehicle>(new Enterprise(), new Empty<Vehicle>()))));
+      //TestAssignment3();
+      //TestAssignment3Advanced();
+      TestAssignment4();
+    }
+
+    private static void TestAssignment4()
+    {
+      var auto = new Auto(new LargeTank(), new Mercedes500(), 
+        new Mercedes722Comma6(), new Wheels18Inch());
+      while(true)
+      {
+        auto.Tick(1.0f);
+        Console.WriteLine(auto);
+        Console.ReadLine();
+      }
+    }
+
+    private static void TestAssignment3Advanced()
+    {
+      var t = new Assignment3Advanced.TrafficLight();
+      while (true)
+      {
+        t.Tick(1.0f);
+        Console.WriteLine(t);
+        Console.ReadLine();
+      }
+    }
+
+    private static void TestAssignment3()
+    {
+      var t = new Assignment3.TrafficLight();
+      while (true)
+      {
+        t.Tick(1.0f);
+        Console.WriteLine(t);
+        Console.ReadLine();
+      }
     }
 
     private static void TestAssignment2(Vehicle v1, Vehicle v2, Vehicle v3)

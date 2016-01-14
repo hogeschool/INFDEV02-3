@@ -43,9 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assignment1 - Copy.cs" />
     <Compile Include="Assignment2 - advanced.cs" />
     <Compile Include="Assignment2.cs" />
-    <Compile Include="Assignment1.cs" />
+    <Compile Include="Assignment3 - advanced.cs" />
+    <Compile Include="Assignment4.cs" />
+    <Compile Include="Assignment3.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
