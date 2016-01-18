@@ -1,6 +1,6 @@
 package assignment4;
 
-public abstract class Engine implements PowertrainComponent {
+public abstract class Engine implements PowerTrainComponent {
     int cylinders;
     int horsePower;
 
@@ -11,4 +11,8 @@ public abstract class Engine implements PowertrainComponent {
     int getHorsePower(){
         return horsePower;
     }
+
+    float burn(float litersOfFuel){
+        return turn(litersOfFuel);
+    };
 }

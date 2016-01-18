@@ -1,11 +1,13 @@
 package assignment4;
 
+import java.time.Duration;
+
 public abstract class Entity {
-    float positionX = 0f;
+    Position positionX = new Position(0f);
 
-    abstract void tick(float timeDifference);
+    abstract void tick(Duration duration);
 
-    float getPositionX(){
+    Position getPositionX(){
         return positionX;
     }
 }

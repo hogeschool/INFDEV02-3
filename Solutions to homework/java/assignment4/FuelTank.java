@@ -1,33 +1,56 @@
 package assignment4;
 
-public abstract class FuelTank implements Component{
-    float capacity;
+
+import java.time.Duration;
+
+public class FuelTank implements Component{
+    float fuelCapacity;
     float fuelAmount;
+    float pumpSpeed;
 
-    abstract float pumpFuel(float timeDifference);
+    float getFuelCapacity(){
+        return fuelCapacity;
+    }
 
-    float getCapacity(){
-        return capacity;
+    public void setFuelCapacity(float fuelCapacity) {
+        this.fuelCapacity = fuelCapacity;
     }
 
     float getFuelAmount(){
         return fuelAmount;
     }
 
+    public void setFuelAmount(float fuelAmount) {
+        this.fuelAmount = fuelAmount;
+    }
+
     void addFuel(float amount){
         fuelAmount += amount;
 
-        float difference = fuelAmount - capacity;
+        float difference = fuelAmount - fuelCapacity;
         if(difference > 0){
-            fuelAmount = capacity;
+            fuelAmount = fuelCapacity;
             System.out.printf("You spilled %f liters of precious fuel :( \n", difference);
         }
     }
 
     @Override
     public String toString() {
+
         return "FuelTank{" +
                 "fuelAmount=" + fuelAmount +
                 '}';
     }
+
+    public float pumpFuel(Duration duration){
+        float amount = duration.toMinutes() * pumpSpeed ;
+
+        if(this.fuelAmount >= amount){
+            this.fuelAmount -= amount;
+            return amount;
+        }
+
+        return 0f;
+    }
+
 }

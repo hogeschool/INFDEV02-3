@@ -1,8 +1,10 @@
 package assignment4;
 
+import com.sun.tools.javac.util.List;
+
 public class Mercedes722Comma6Gearbox extends Gearbox {
 
-    public float turn(float engineRPM){
-        return 7.5f * engineRPM / (3500f * 18 * 2.54f);
+    public Mercedes722Comma6Gearbox() {
+        gears = List.of(300, 200, 100, 50, 10);
     }
 }

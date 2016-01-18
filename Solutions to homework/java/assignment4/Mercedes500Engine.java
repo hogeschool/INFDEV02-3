@@ -3,8 +3,12 @@ package assignment4;
 public class Mercedes500Engine extends Engine{
 
     public Mercedes500Engine() {
-        cylinders = 12;
-        horsePower = 517;
+        this.cylinders = 12;
+        this.horsePower = 517;
+    }
+
+    public float burn(float litersOfFuel){
+        return turn(litersOfFuel);
     }
 
     public float turn(float fuel){

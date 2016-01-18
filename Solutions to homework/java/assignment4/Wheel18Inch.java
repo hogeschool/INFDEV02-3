@@ -1,9 +1,7 @@
 package assignment4;
 
-public class Wheel18Inch extends Wheels{
-
-
+public class Wheel18Inch extends Wheel {
     public Wheel18Inch() {
-        radius = 18;
+        this.setRadius(18f);
     }
 }

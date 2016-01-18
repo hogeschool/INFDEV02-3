@@ -1,22 +1,26 @@
 package assignment4;
 
+import com.sun.tools.javac.util.List;
+
 import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 public class Application {
     public static void main(String[] args) {
-
         Auto auto = new Auto(
-                0f,
+                new Position(0f),
                 new LargeTank(),
                 new Mercedes500Engine(),
                 new Mercedes722Comma6Gearbox(),
-                new Wheel18Inch()
+                List.of(new Wheel18Inch(),new Wheel18Inch(),new Wheel18Inch(),new Wheel18Inch())
         );
 
-        auto.loadFuel(2f);
+        auto.loadFuel(20f);
 
         while(true){
-            auto.tick(1f);
+            auto.drive(Duration.of(1L, ChronoUnit.MINUTES));
             System.out.println(auto);
             try {
                 System.in.read();
@@ -24,6 +28,5 @@ public class Application {
                 System.err.println(ioe.getMessage());
             }
         }
-
     }
 }
