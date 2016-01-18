@@ -2,54 +2,50 @@
 	The course is structured into six lectures. The six lectures take place during the six weeks of the course, but are not necessarily in a one-to-one correspondance with the course weeks. For example, lectures one and two are fairly short and can take place during a single week.
 
 		\subsection{Week 1 - statically typed programming languages}
-
-			\paragraph*{Topics}
-
-				\begin{itemize}
-					\item What are types?
-					\item (\textbf{Advanced}) Typing and semantic rules: how do we read them?
-					\item Introduction to Java and C\# (\textbf{advanced}) with type rules and semantics
-					\begin{itemize}
-						\item Classes
-						\item Fields/attributes
-						\item Constructor(s), methods, and static methods
-						\item Statements, expressions, and primitive types
-						\item (\textbf{Advanced}) Lambda's
-					\end{itemize}
-				\end{itemize}
-
-			\paragraph*{Homework}
-				\begin{itemize}
-					\item Write an example of Python code that would cause a type error in Java/C\#
-					\item Given the following semantic and typing rules, write down how we read them; make an example code that uses them
-					\item Write a Java/C\# program featuring
-					\begin{itemize}
-						\item A \texttt{Counter} class;
-						\item With a \texttt{count} integer attribute;
-						\item With an empty (parameterless) constructor;
-						\item With a method \texttt{Reset};
-						\item With a method \texttt{Tick};
-						\item (\textbf{Advanced}) With a static method/overloaded operator \texttt{Plus} which adds two counters into one;
-						\item (\textbf{Advanced}) With a method \texttt{OnTarget} that takes as input a lambda function which will be fired when the counter reaches a given count.
-					\end{itemize}
-				\end{itemize}
-
-
-		\subsection{Week 2 - reuse through polymorphism and generics}
-
 		\paragraph*{Topics}
-
+		\begin{itemize}
+			\item What are types?
+			\item (\textbf{Advanced}) Typing and semantic rules: how do we read them?
+			\item Introduction to Java and C\# (\textbf{advanced}) with type rules and semantics
+			\begin{itemize}
+				\item Classes
+				\item Fields/attributes
+				\item Constructor(s), methods, and static methods
+				\item Statements, expressions, and primitive types
+				\item Arrays
+				\item (\textbf{Advanced}) Lambda's
+			\end{itemize}
+		\end{itemize}
+		
+		\paragraph*{Homework}
+		\begin{itemize}
+			\item Write an example of Python code that would cause a type error in Java/C\#
+			\item Given the following semantic and typing rules, write down how we read them; make an example code that uses them
+			\item Write a Java/C\# program featuring
+			\begin{itemize}
+				\item A \texttt{Counter} class;
+				\item With a \texttt{count} integer attribute;
+				\item With an empty (parameterless) constructor;
+				\item With a method \texttt{Reset};
+				\item With a method \texttt{Tick};
+				\item (\textbf{Advanced}) With a static method/overloaded operator \texttt{Plus} which adds two counters into one;
+				\item (\textbf{Advanced}) With a method \texttt{OnTarget} that takes as input a lambda function which will be fired when the counter reaches a given count.
+			\end{itemize}
+		\end{itemize}
+		
+		
+		
+		\subsection{Week 2 - reuse through polymorphism}
+		
+		\paragraph*{Topics}			
 		\begin{itemize}
 			\item What is code reuse?
 			\item Interfaces and implementation
 			\item Implicit vs explicit conversion
 			\item (\textbf{Advanced}) Implicit and explicit conversion type rules
 			\item Runtime type testing
-			\item (\textbf{Advanced}) Generic parameters
-			\item (\textbf{Advanced}) Interfaces and implementation in the presence of generic parameters
-			\item (\textbf{Advanced}) Covariance and contravariance in the presence of generic parameters
 		\end{itemize}
-
+		
 		\paragraph*{Homework}
 		\begin{itemize}
 			\item Write a \texttt{Vehicle} interface with a method \texttt{move} and a method \texttt{loadFuel}; \texttt{loadFuel} accepts a \texttt{Fuel} instance, where \texttt{Fuel} is an interface of your writing; \texttt{move} returns a boolean which is \texttt{true} if there is enough fuel, and \texttt{false} otherwise
@@ -57,9 +53,66 @@
 			\item Write a concrete class \texttt{Truck} and a concrete class \texttt{Diesel} that implement, respectively, \texttt{Vehicle} and \texttt{Fuel}; the \texttt{Truck} checks that the given fuel is indeed \texttt{Diesel}
 			\item Write a concrete class \texttt{Enterprise} and a concrete class \texttt{Dilithium} that implement, respectively, \texttt{Vehicle} and \texttt{Fuel}; the \texttt{Enterprise} checks that the given fuel is indeed \texttt{Dilithium}
 			\item Make a program that receives three vehicles, without knowing their concrete type, and moves them (without resorting to conversions) until their fuel is up
-
+		\end{itemize}
+		
+		\subsection{Week 3 - reuse through generics}
+		\paragraph*{Topics}			
+		\begin{itemize}
+			\item (\textbf{Advanced}) Generic parameters
+			\item (\textbf{Advanced}) Interfaces and implementation in the presence of generic parameters
+			\item (\textbf{Advanced}) Covariance and contravariance in the presence of generic parameters
+		\end{itemize}
+		
+		\paragraph*{Homework}
+		\begin{itemize}
 			\item (\textbf{Advanced}) Make a \texttt{List<T>} interface with methods \texttt{Length}, \texttt{Iterate}, \texttt{Map}, and \texttt{Filter}
 			\item (\textbf{Advanced}) Define the concrete classes \texttt{Node<T>} and \texttt{Empty<T>} both implementing \texttt{List<T>}
 			\item (\textbf{Advanced}) Make a \texttt{List<Vehicle>}, fill it with a series of concrete vehicles, and make them all move ten times
 		\end{itemize}
-
+		
+		
+		
+		\subsection{Week 4 - architectural considerations}
+		
+		\paragraph*{Topics}			
+		\begin{itemize}
+			\item Encapsulation
+			\item Abstract classes: between interfaces and implementation
+			\item Inheritance
+		\end{itemize}
+		
+		\paragraph*{Homework}
+		\begin{itemize}
+			\item Write an \texttt{Event} abstract class or interface with a method \texttt{perform}; 
+			\item Write a \texttt{Timer} class with a method \texttt{tick} and a method \texttt{reset}; \texttt{reset} restarts the timer, while \texttt{tick} makes the timer move forward and returns whether or not the target time has been reached; when the timer reaches the target time, then fire the events in the list of timer responses
+			\item Make a \texttt{TrafficLight} class which uses timers to implement red, green, and yellow lights;
+			\item (\textbf{Advanced}) Rebuild timers, but this time with lambda's instead of our custom \texttt{Event}.
+		\end{itemize}
+		
+		\subsection{Week 5 - yet more architectural considerations}
+		\paragraph*{Topics}			
+		\begin{itemize}
+			\item (\textbf{Advanced}) Composition versus inheritance
+			\item (\textbf{Advanced}) Entity/component model
+		\end{itemize}
+		
+		\paragraph*{Homework}
+		\begin{itemize}
+			\item (\textbf{Advanced}) Make a \texttt{Component} interface;
+			\item (\textbf{Advanced}) Make an \texttt{Entity} abstract class which houses a list of components;
+			\item (\textbf{Advanced}) Write a \texttt{Car} class that inherits from \texttt{Entity} and which implements all the functionality that you would expect from a car, but with the \textit{Entity-Component} model; you will need to build components for the engine, the wheels, etc. and all that the \texttt{Car} class does is make correct use of these components.
+		\end{itemize}
+		
+		\paragraph*{Homework}
+		\subsection{Week 6 - standard libraries}
+		\paragraph*{Topics}			
+		\begin{itemize}
+			\item Collection libraries of JVM and .Net
+			\item GUI libraries
+			\item Web GUI libraries
+		\end{itemize}
+		
+		\begin{itemize}
+			\item Make a form application that shows a scrolling panel containing elements from the classes built in the previous homework: lightswitches, cars, timers, etc.;
+			\item Make the application web-based with ASP.Net or JSF.
+		\end{itemize}
