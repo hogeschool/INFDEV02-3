@@ -22,7 +22,7 @@ let slides =
       [
         !"written exam"
         !"4 open questions"
-        !"code and semantics"
+        !"code, type system, and semantics"
         !(@"no grade: go (score$\ge$75) or no go (otherwise)")
       ]
 
@@ -48,7 +48,7 @@ let slides =
       [
         !"the oral is entirely based on the practicum assignments"
         !"we remove some pieces of code from the working solutions and you fill them back in"
-        !"the oral gives you the grade"
+        !"the oral gives you the final grade for the course"
       ]
 
     SubSection("Expected study effort")
@@ -61,15 +61,6 @@ let slides =
       ]
 
     SubSection("Cooperation between SLC's and DEV")
-    ItemsBlock
-      [
-        !"we will aim towards a better comunication structure with SLC's"
-        !"we will use the homework as a measure of your study and effort"
-        !"we are more than willing to help you in any way we can, but without your work we cannot do anything\pause"
-        !"please learn to program, it is seriously awesome :)"
-      ]
-
-    SubSection "Cooperation between SLC's and DEV"
     ItemsBlock
       [
         !"we will aim towards a better comunication structure with SLC's"
@@ -162,10 +153,10 @@ let slides =
         ! "This is by far and large the most typical solution to increase safety and productivity"
       ]
 
-    SubSection "What is static typing"
+    SubSection "What is static typing?"
     ItemsBlock
       [
-        ! "When declaring a variable, we also specifies what sort of data it will contain"
+        ! "When declaring a variable, we also specify what sort of data it will contain"
         ! @"The \textbf{sort} of data contained is called \textbf{TYPE} of the variable"
         ! "Types can be either primitives (int, string, etc.), custom (classes), or compositions (functions, list of elements of a given type, etc.)"
       ]
@@ -175,6 +166,7 @@ let slides =
         ! "Especially in mainstream languages, the specification of the type of a variable is done by hand by the programmer"
         ! "In other languages (mostly functional languages like F\#, Haskell, etc.) the type of variables is automatically guessed by the compiler"
         ! "In our case our programs will become a bit more verbose but better specified"
+        ! "Still, static typing is not necessarily connected with verbosity"
       ]
 
     VerticalStack[
@@ -234,6 +226,7 @@ let slides =
             Conclusion = "C"
           }
         ]
+        Pause
         TextBlock @"If A and B are true, then we can conclude C" 
         ])
 
@@ -291,7 +284,7 @@ let slides =
             Conclusion = @"\mathtt{if c then a else b : None}"
           }
         ]
-        TextBlock "If a part of a program does not have a type derived through the typing rules, then the whole program cannot be run and we get a compiler error"
+        TextBlock "If a part of a program does not have a type derived through the typing rules (also None is fine), then the whole program cannot be run and we get a compiler error"
         ])
 
     TextBlock @"We can use typing rules\footnote{In this case we simply call them \textbf{inference rules}} in a broader scope: also for specifying the semantics of constructs"
@@ -308,30 +301,32 @@ let slides =
       VerticalStack[
         ItemsBlock[
           ! "We want to specify this in the inference rule notation"
-          ! @"Assume that ""=>"" means ""evaluates to"", as in:"
-          !! "3+1 => 4"
+          ! @"Assume that $\rightarrow$ means ""evaluates to"", as in:"
+          ! @"$3+1 \rightarrow 4$"
         ]
         TypingRules[
           {
-            Premises = ["<c,S,H> => <True,S',H'>"; "<a,S',H'> => <res,S'',H''>"]
-            Conclusion = "<if c then a else b,S,H> => <res,S'',H''>"
+            Premises = ["<c,S,H> \rightarrow <True,S',H'>"; "<a,S',H'> \rightarrow <res,S'',H''>"]
+            Conclusion = "<if c then a else b,S,H> \rightarrow <res,S'',H''>"
           }
           {
-            Premises = ["<c,S,H> => <False,S',H'>"; "<b,S',H'> => <res,S'',H''>"]
-            Conclusion = "<if c then a else b,S,H> => <res,S'',H''>"
+            Premises = ["<c,S,H> => <False,S',H'>"; "<b,S',H'> \rightarrow <res,S'',H''>"]
+            Conclusion = "<if c then a else b,S,H> \rightarrow <res,S'',H''>"
           }
         ]])
 
     PythonStateTrace(
       (def "f" ["x"] (ret (var "x" .* constInt 2)) >>
-       call "f" [constInt 20]),
-      { Stack = [["PC", constInt 2] |> Map.ofList]; Heap = Map.empty; InputStream = [] }
+       call "f" [constInt 20] >>
+       endProgram),
+      { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = [] }
     )
 
 //Statically typed, object-oriented programming languages
 //We will use Java and C\#
 //Java: some pros and cons
 //C\#: some pros and cons
+//Assignment can be done in either of the languages
 //Why both? Extremely used, together they cover a lot of possible very different applications on the most popular platforms.
 //
 //

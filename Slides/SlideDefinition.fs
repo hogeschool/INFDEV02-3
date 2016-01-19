@@ -1,18 +1,7 @@
 ﻿module SlideDefinition
 open CodeDefinition
-
-let beginFrame = @"\begin{frame}[fragile]{\CurrentSection}" + "\n"
-let endFrame = "\n" + @"\end{frame}" + "\n\n"
-let beginBlock = @"\begin{block}{\CurrentSubSection}" + "\n"
-let endBlock = "\n" + @"\end{block}" + "\n\n"
-let beginExampleBlock = @"\begin{exampleblock}{}" + "\n"
-let endExampleBlock = "\n" + @"\end{exampleblock}" + "\n\n"
-let beginItemize = @"\begin{itemize}" + "\n"
-let endItemize = "\n" + @"\end{itemize}" + "\n"
-let beginCode = @"\begin{lstlisting}" + "\n"
-let endCode = "\n" + @"\end{lstlisting}" + "\n"
-let beginMath = @"$$"
-let endMath = @"$$" + "\n"
+open Coroutine
+open CommonLatex
 
 type SlideElement = 
   | Section of string 
@@ -78,8 +67,15 @@ type SlideElement =
       | VerticalStack ses ->
           let sess = ses |> List.map (fun se -> se.ToStringAsElement() + " \n")
           sprintf @"%s%s%s" beginFrame (List.fold (+) "" sess) endFrame
-      | PythonStateTrace(c,st) ->
-        ""
+      | PythonStateTrace(p,st) ->
+        let stackTraces = st :: runToEnd (runPython p) st
+        let ps = (p.AsPython "").TrimEnd([|'\n'|])
+        let stackTraceTables = 
+          [ for st in stackTraces do 
+            let stack,heap = st.AsSlideContent
+            let slide = sprintf @"%s%s%s%s%s%s%s" beginFrame beginCode ps endCode stack heap endFrame
+            yield slide ]
+        stackTraceTables |> List.fold (+) ""
       | _ -> ""
 
 and TypingRule =
