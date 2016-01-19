@@ -189,26 +189,36 @@ let slides =
       TextBlock "No: we get a compiler error because a string cannot be used where a number is expected"
       ]
 
-// TODO: translate these examples as well
-//    VerticalStack[
-//      Question "What is wrong with this?"
-//      PythonCodeBlock(
-//          "x" := (call "input" []) >>
-//          ifelse (var "x" .> constInt 100) 
-//                 (call "print" [constString "dumb"])
-//                 (call "print" [constString "dumber"]))
-//      Pause
-//      TextBlock @"The comparison is nonsensical if \texttt{x} is not a number"
-//      ]
-//
-//    VerticalStack[
-//      Question "What is wrong with this?"
-//      PythonCodeBlock(
-//          def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
-//          call "g" [constInt -1])
-//      Pause
-//      TextBlock @"We expect something with a \texttt{drive} method, but get an integer instead"
-//      ]
+    VerticalStack[
+      PythonCodeBlock(
+          "x" := (call "input" []) >>
+          ifelse (var "x" .> constInt 100) 
+                 (call "print" [constString "dumb"])
+                 (call "print" [constString "dumber"]))
+      TextBlock "Becomes, typed:"
+      CSharpCodeBlock(
+          typedDecl "x" "int" >>
+          (("x" := (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
+           ifelse (var "x" .> constInt 100) 
+                  (call "Console.WriteLine" [constString "safe"])
+                  (call "Console.WriteLine" [constString "safer"])))
+      Question @"What has improved and why?"
+      Pause
+      TextBlock "The variable declaration specifies what is allowed (and what is not) inside the variable."
+      ]
+
+    VerticalStack[
+      PythonCodeBlock(
+          def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
+          call "g" [constInt -1])
+      TextBlock "Becomes, typed:"
+      CSharpCodeBlock(
+          typedDef "g" ["Car","car"] "void" (ret (methodCall "car" "drive" [constInt 2])) >>
+          call "g" [constInt -1])
+      Question @"What has improved and why?"
+      Pause
+      TextBlock "The function declaration specifies available methods of \texttt{car}. We will thus get a compiler error."
+      ]
 
     SubSection "Typing rules and semantic rules"
     ItemsBlock[
@@ -226,7 +236,6 @@ let slides =
             Conclusion = "C"
           }
         ]
-        Pause
         TextBlock @"If A and B are true, then we can conclude C" 
         ])
 
@@ -277,14 +286,15 @@ let slides =
           ! "We want to specify this in the typing rule notation"
           ! @"Assume that "":"" means ""has type"", as in:"
           !! "x : int"
+          ! @"Assume that \texttt{void} is the type without values"
         ]
         TypingRules[
           {
-            Premises = [@"\mathtt{c : Boolean}"; @"\mathtt{a : None}"; @"\mathtt{b : None}"]
-            Conclusion = @"\mathtt{if c then a else b : None}"
+            Premises = [@"\mathtt{c : Boolean}"; @"\mathtt{a : void}"; @"\mathtt{b : void}"]
+            Conclusion = @"\mathtt{if\ c\ then\ a\ else\ b\ :\ void}"
           }
         ]
-        TextBlock "If a part of a program does not have a type derived through the typing rules (also None is fine), then the whole program cannot be run and we get a compiler error"
+        TextBlock "If a part of a program does not have a type derived through the typing rules (also void is fine), then the whole program cannot be run and we get a compiler error"
         ])
 
     TextBlock @"We can use typing rules\footnote{In this case we simply call them \textbf{inference rules}} in a broader scope: also for specifying the semantics of constructs"
@@ -304,14 +314,15 @@ let slides =
           ! @"Assume that $\rightarrow$ means ""evaluates to"", as in:"
           ! @"$3+1 \rightarrow 4$"
         ]
+        Tiny
         TypingRules[
           {
-            Premises = ["<c,S,H> \rightarrow <True,S',H'>"; "<a,S',H'> \rightarrow <res,S'',H''>"]
-            Conclusion = "<if c then a else b,S,H> \rightarrow <res,S'',H''>"
+            Premises = [@"\langle c,S,H \rangle \rightarrow \langle True,S',H' \rangle"; @"\langle a,S',H' \rangle \rightarrow \langle res,S'',H'' \rangle"]
+            Conclusion = @"\langle \mathtt{if\ c\ then\ a\ else\ b},S,H \rangle \rightarrow \langle res,S'',H'' \rangle"
           }
           {
-            Premises = ["<c,S,H> => <False,S',H'>"; "<b,S',H'> \rightarrow <res,S'',H''>"]
-            Conclusion = "<if c then a else b,S,H> \rightarrow <res,S'',H''>"
+            Premises = [@"\langle c,S,H \rangle \rightarrow \langle False,S',H' \rangle"; @"\langle b,S',H' \rangle \rightarrow \langle res,S'',H'' \rangle"]
+            Conclusion = @"\langle \mathtt{if\ c\ then\ a\ else\ b},S,H \rangle \rightarrow \langle res,S'',H'' \rangle"
           }
         ]])
 
@@ -331,6 +342,7 @@ let slides =
 //
 //
 //From Python to Java/C\#
+//Always put semantics and typing information when needed
 //Classes
 //Static methods (main)
 //Variables, statements, function calls, primitive data types (also arrays)

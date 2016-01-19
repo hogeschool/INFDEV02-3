@@ -14,6 +14,7 @@ type SlideElement =
   | Block of SlideElement
   | Items of List<SlideElement>
   | PythonCodeBlock of Code
+  | Tiny
   | TypingRules of List<TypingRule>
   | CSharpCodeBlock of Code
   | VerticalStack of List<SlideElement>
@@ -23,15 +24,18 @@ type SlideElement =
       match this with
       | Pause -> @"\pause"
       | Question q -> 
-          sprintf @"%s%s%s" beginExampleBlock q endExampleBlock
+          sprintf @"%s\textit{%s}%s" beginExampleBlock q endExampleBlock
       | InlineCode c -> sprintf @"\texttt{%s}" c
       | Text t -> t
+      | Tiny -> sprintf "\\tiny\n"
       | Block t ->
           sprintf @"%s%s%s" beginExampleBlock (t.ToStringAsElement()) endExampleBlock
       | Items items ->
-          sprintf @"%s%s%s" beginItemize (items |> Seq.map(fun item -> @"\item " + item.ToStringAsElement() + "\n") |> Seq.fold (+) "" ) endItemize
+          sprintf @"%s%s%s" beginItemize (items |> Seq.map(function | Pause -> @"\pause" | item -> @"\item " + item.ToStringAsElement() + "\n") |> Seq.fold (+) "" ) endItemize
       | PythonCodeBlock c ->
           sprintf @"%s%s%s" beginCode (c.AsPython "") endCode
+      | CSharpCodeBlock c ->
+          sprintf @"%s%s%s" beginCode (c.AsCSharp "") endCode
       | TypingRules tr ->
           let trs = tr |> List.map (fun t -> t.ToString())
           (List.fold (+) "" trs)
@@ -53,14 +57,16 @@ type SlideElement =
           sprintf @"%s%s%s%s%s" beginFrame beginBlock (t.ToStringAsElement()) endBlock endFrame
       | Pause -> @"\pause"
       | Question q ->
-          sprintf @"%s%s%s" beginFrame q endFrame
+          sprintf @"%s%s%s" beginFrame (this.ToStringAsElement()) endFrame
       | InlineCode c ->
           sprintf @"%s\texttt{%s}%s" beginCode c endCode
       | Text t -> t
       | Items items ->
-          sprintf @"%s%s%s%s%s" beginFrame beginItemize (items |> Seq.map(fun item -> @"\item " + item.ToStringAsElement() + "\n") |> Seq.fold (+) "" ) endItemize endFrame
+          sprintf @"%s%s%s%s%s" beginFrame beginItemize (items |> Seq.map(function | Pause -> @"\pause" | item -> @"\item " + item.ToStringAsElement() + "\n") |> Seq.fold (+) "") endItemize endFrame
       | PythonCodeBlock c ->
           sprintf @"%s%s%s%s%s" beginFrame beginCode (c.AsPython "") endCode endFrame
+      | CSharpCodeBlock c ->
+          sprintf @"%s%s%s%s%s" beginFrame beginCode (c.AsCSharp "") endCode endFrame
       | TypingRules tr ->
           let trs = tr |> List.map (fun t -> t.ToString())
           sprintf @"%s%s%s" beginFrame (List.fold (+) "" trs) endFrame
@@ -76,7 +82,7 @@ type SlideElement =
             let slide = sprintf @"%s%s%s%s%s%s%s" beginFrame beginCode ps endCode stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
-      | _ -> ""
+      | _ -> failwith "Unsupported"
 
 and TypingRule =
   {
