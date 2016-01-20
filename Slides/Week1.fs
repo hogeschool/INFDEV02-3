@@ -592,7 +592,8 @@ let slides =
 //Instancing classes, calling methods, and calling static methods
 //Static methods (main)
 //\textbf{Advanced} lambda's
-//
+//Add Java examples as well, with keywords for specific translation later instead of strings for the methods
+//The Java examples appear after C# in a new slide, right beneath the C# example
 //
 //\SlideSection{Conclusion}
 //\SlideSubSection{Lecture topics}
