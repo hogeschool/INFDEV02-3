@@ -20,12 +20,13 @@ let (!+) = List.fold (+) ""
 type Code =
   | End
   | None
-  | ClassDecl of string * List<Code>
+  | ClassDef of string * List<Code>
   | Return of Code
   | TypedDecl of string * string * Option<Code>
   | Var of string
   | Hidden of Code
   | ConstLambda of int * List<string> * Code
+  | ConstBool of bool
   | ConstInt of int
   | ConstFloat of float
   | ConstString of string
@@ -35,39 +36,25 @@ type Code =
   | Call of string * List<Code>
   | MethodCall of string * string * List<Code>
   | If of Code * Code * Code
+  | While of Code * Code
   | Op of Code * Operator * Code
   | Sequence of Code * Code
   with 
-    member this.NumberOfPythonLines = 
-      match this with
-      | ClassDecl(s,ms) -> 1 + (ms |> List.map (fun m -> m.NumberOfPythonLines) |> List.fold (+) 0)
-      | None | Return _ | Var _ -> 1
-      | ConstInt _ | ConstFloat _ | ConstString _ -> 1
-      | Assign (v,c) -> 1
-      | Def (n,args,body) -> 1 + body.NumberOfPythonLines
-      | Call(n,args) -> 1
-      | MethodCall(n,m,args) -> 1
-      | If(c,t,e) ->
-        1 + t.NumberOfPythonLines + 1 + e.NumberOfPythonLines
-      | Op(a,op,b) ->
-        1
-      | Sequence (p,q) ->
-        p.NumberOfPythonLines + q.NumberOfPythonLines
-      | _ -> failwith "Unsupported Python statement"
     member this.AsPython pre = 
       match this with
       | End -> ""
       | None -> "None"
-      | ClassDecl(s,ms) -> 
+      | ClassDef(s,ms) -> 
         let mss = ms |> List.map (fun m -> m.AsPython (pre + "  ") + "\n")
         sprintf "class %s:\n%s\n" s !+mss
       | Return c ->
-        sprintf "%sreturn %s\n" pre (c.AsPython "")
+        sprintf "%sreturn %s\n" pre ((c.AsPython "").Replace("\n",""))
       | Var s -> s
+      | ConstBool b -> b.ToString()
       | ConstInt i -> i.ToString()
       | ConstFloat f -> f.ToString()
       | ConstString s -> sprintf "\"%s\"" s
-      | Assign (v,c) -> sprintf "%s%s = %s\n" pre v (c.AsPython "")
+      | Assign (v,c) -> sprintf "%s%s = %s\n" pre v ((c.AsPython "").TrimEnd([|'\n'|]))
       | ConstLambda (pc,args,body) ->
         let argss = args |> List.map (fun a -> a + ",")
         sprintf "%slambda(%s): %s" pre ((!+argss).TrimEnd[|','|]) (body.AsPython (pre + "  "))
@@ -75,32 +62,47 @@ type Code =
         let argss = args |> List.map (fun a -> a + ",")
         sprintf "%sdef %s(%s):\n%s" pre n ((!+argss).TrimEnd[|','|]) (body.AsPython (pre + "  "))
       | Call(n,args) ->
-        let argss = args |> List.map (fun a -> a.AsPython "" + ",")
+        let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
         sprintf "%s%s(%s)\n" pre n ((!+argss).TrimEnd[|','|])
       | MethodCall(n,m,args) ->
-        let argss = args |> List.map (fun a -> a.AsPython "" + ",")
+        let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
         sprintf "%s%s.%s(%s)\n" pre n m ((!+argss).TrimEnd[|','|])
       | If(c,t,e) ->
-        sprintf "%sif %s:\n%selse:\n%s" pre (c.AsPython "") (t.AsPython (pre + "  ")) (e.AsPython (pre + "  "))
+        let tS = (t.AsPython (pre + "  "))
+        sprintf "%sif %s:\n%s%selse:\n%s" pre (c.AsPython "") tS pre (e.AsPython (pre + "  "))
+      | While(c,b) ->
+        let bs = (b.AsPython (pre + "  "))
+        sprintf "%swhile %s:\n%s" pre (c.AsPython "") bs
       | Op(a,op,b) ->
         sprintf "%s%s%s" ((a.AsPython "").Replace("\n","")) (op.AsPython) ((b.AsPython (pre + "  ")).Replace("\n",""))
       | Sequence (p,q) ->
-        sprintf "%s%s" (p.AsPython pre) (q.AsPython pre)
+        let res = sprintf "%s%s" (p.AsPython pre) (q.AsPython pre)
+        res
       | Hidden(_) -> ""
       | _ -> failwith "Unsupported Python statement"
+    member this.NumberOfPythonLines = 
+      let code = ((this.AsPython ""):string).TrimEnd([|'\n'|])
+      let lines = code.Split([|'\n'|])
+      lines.Length
 
     member this.AsCSharp pre = 
       match this with
       | End -> ""
       | None -> "void"
-      | ClassDecl(s,ms) -> 
-        let mss = ms |> List.map (fun m -> m.AsCSharp (pre + "  ") + "\n")
-        sprintf "class %s {\n%s }\n" s !+mss
+      | ClassDef(s,ms) -> 
+        let mss = ms |> List.map (fun m -> m.AsCSharp (pre + "  "))
+        let res = sprintf "class %s {\n%s%s}\n" s (!+mss) pre
+        res
       | Return c ->
         sprintf "%sreturn %s;\n" pre ((c.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
-      | TypedDecl(s,t,Option.None) -> sprintf "%s%s %s;\n" pre t s
-      | TypedDecl(s,t,Some v) -> sprintf "%s%s %s = %s;\n" pre t s ((v.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
+      | TypedDecl(s,t,Option.None) -> 
+        if t = "" then sprintf "%s%s;\n" pre s
+        else sprintf "%s%s %s;\n" pre t s
+      | TypedDecl(s,t,Some v) -> 
+        if t = "" then sprintf "%s%s = %s;\n" pre s ((v.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
+        else sprintf "%s%s %s = %s;\n" pre t s ((v.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
       | Var s -> s
+      | ConstBool b -> b.ToString()
       | ConstInt i -> i.ToString()
       | ConstFloat f -> f.ToString()
       | ConstString s -> sprintf "\"%s\"" s
@@ -110,7 +112,8 @@ type Code =
         sprintf "%s(%s) => %s" pre ((!+argss).TrimEnd[|','|]) (body.AsCSharp (pre + "  "))
       | TypedDef (n,args,t,body) ->
         let argss = args |> List.map (fun (t,a) -> t + " " + a + ",")
-        sprintf "%s%s %s(%s) {\n%s }\n" pre t n ((!+argss).TrimEnd[|','|]) (body.AsCSharp (pre + "  "))
+        (if t = "" then sprintf "%s%s(%s) {\n%s%s}\n" pre n
+         else sprintf "%s%s %s(%s) {\n%s%s}\n" pre t n) ((!+argss).TrimEnd[|','; '\n'|]) (body.AsCSharp (pre + "  ")) pre
       | Call(n,args) ->
         let argss = args |> List.map (fun a -> ((a.AsCSharp "").TrimEnd[|','; '\n'; ';'|]) + ",")
         sprintf "%s%s(%s);\n" pre n ((!+argss).TrimEnd[|','; '\n'; ';'|])
@@ -119,11 +122,17 @@ type Code =
         sprintf "%s%s.%s(%s);\n" pre n m ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | If(c,t,e) ->
         sprintf "%sif(%s) {\n%s } else {\n%s }" pre (c.AsCSharp "") (t.AsCSharp (pre + "  ")) (e.AsCSharp (pre + "  "))
+      | While(c,b) ->
+        sprintf "%swhile(%s) {\n%s }" pre (c.AsCSharp "") (b.AsCSharp (pre + "  "))
       | Op(a,op,b) ->
         sprintf "%s%s%s" ((a.AsCSharp "").Replace("\n","").Replace(";","")) (op.AsCSharp) ((b.AsCSharp (pre + "  ")).Replace("\n","").Replace(";",""))
       | Sequence (p,q) ->
         sprintf "%s%s" (p.AsCSharp pre) (q.AsCSharp pre)
       | _ -> failwith "Unsupported Python statement"
+    member this.NumberOfCSharpLines = 
+      let code = ((this.AsCSharp ""):string).TrimEnd([|'\n'|])
+      let lines = code.Split([|'\n'|])
+      lines.Length
 
 
 let printBindings (b:Map<string, Code>) =
@@ -254,12 +263,27 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
         do! pause
         return! runPython body
       | _ -> return failwithf "Cannot find function %s" f            
-    | Op (a,Times,b) -> 
+    | Op (a,op,b) -> 
       let! aVal = runPython a
       let! bVal = runPython b
       match aVal,bVal with
-      | ConstInt x, ConstInt y -> return ConstInt(x * y)
-      | _ -> return failwithf "Cannot add %s and %s" (a.AsPython "") (b.AsPython "")
+      | ConstInt x, ConstInt y -> 
+        match op with
+        | Times -> return ConstInt(x * y)
+        | Plus -> return ConstInt(x + y)
+        | Minus -> return ConstInt(x - y)
+        | DividedBy -> return ConstInt(x / y)
+        | GreaterThan -> return ConstBool(x > y)
+      | _ -> return failwithf "Cannot perform %s %s %s" (a.AsPython "") op.AsPython (b.AsPython "")
+    | If(c,t,e) ->
+      let! cVal = runPython c
+      match cVal with
+      | ConstBool true ->
+        return! runPython (Sequence(End,t))
+      | ConstBool false ->
+        do! changePC ((+) (t.NumberOfPythonLines + 1))
+        return! runPython (Sequence(End,e))
+      | _ -> return failwith "Malformed if"
     | Sequence (p,k) ->
       let! _ = runPython p
       do! incrPC
@@ -267,7 +291,7 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
       return! runPython k
     | End -> return None
     | c -> return failwithf "Unsupported construct %A" c
-//    | ClassDecl of string * List<Code>
+//    | ClassDef of string * List<Code>
 //    | TypedVar of string * string
 //    | TypedDef of string * List<string * string> * string * Code
 //    | MethodCall of string * string * List<Code>
@@ -275,7 +299,7 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
   }
 
 
-let classDecl c m = ClassDecl(c,m)
+let classDef c m = ClassDef(c,m)
 let (:=) x y = Assign(x,y)
 let constInt x = ConstInt(x)
 let constFloat x = ConstFloat(x)
@@ -289,6 +313,7 @@ let typedDef x l t b = TypedDef(x,l,t,b)
 let call x l = Call(x,l)
 let methodCall x m l = MethodCall(x,m,l)
 let ifelse c t e = If(c,t,e)
+let whiledo c b = While(c,b)
 let (.+) a b = Op(a, Plus, b)
 let (.-) a b = Op(a, Minus, b)
 let (.*) a b = Op(a, Times, b)

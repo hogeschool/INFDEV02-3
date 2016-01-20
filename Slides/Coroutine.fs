@@ -15,6 +15,7 @@ type CoroutineBuilder() =
   member this.ReturnFrom p = p
   member this.Return x = ret x
   member this.Bind(p,k) = p >>= k
+  member this.Combine(p,k) = p >>= (fun () -> k)
 let co = CoroutineBuilder()
 
 let getState : Coroutine<'s,'s> = fun s -> Done(s,s)

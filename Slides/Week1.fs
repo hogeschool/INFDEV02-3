@@ -1,10 +1,21 @@
 ﻿module Week1
 
+open CommonLatex
 open SlideDefinition
 open CodeDefinition
 
 let slides = 
   [
+//    PythonStateTrace(TextSize.Small,
+//      (def "f" ["x"] 
+//        (ifelse (var "x" .> constInt 0) 
+//          (ret ((call "f" [constInt -20]) .+ constInt 1))
+//          (ret (var "x" .* constInt 2))) >>
+//       call "f" [constInt 20] >>
+//       endProgram),
+//      { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = [] }
+//    )
+
     Section("Introduction")
     SubSection("Lecture topics")
     ItemsBlock
@@ -89,7 +100,7 @@ let slides =
     SubSection "Broken code examples"
     VerticalStack[
       Question "What is wrong with this?"
-      PythonCodeBlock(
+      PythonCodeBlock(TextSize.Normal,
           def "f" ["x"] (ret (var "x" .* constInt 2)) >>
           call "f" [constString "nonsense"])
       Pause
@@ -98,20 +109,20 @@ let slides =
 
     VerticalStack[
       Question "What is wrong with this?"
-      PythonCodeBlock(
-          "x" := (call "input" []) >>
+      PythonCodeBlock(TextSize.Normal,
+         ("x" := (call "input" []) >>
           ifelse (var "x" .> constInt 100) 
                  (call "print" [constString "dumb"])
-                 (call "print" [constString "dumber"]))
+                 (call "print" [constString "dumber"])))
       Pause
       TextBlock @"The comparison is nonsensical if \texttt{x} is not a number"
       ]
 
     VerticalStack[
       Question "What is wrong with this?"
-      PythonCodeBlock(
-          def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
-          call "g" [constInt -1])
+      PythonCodeBlock(TextSize.Normal,
+         (def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
+          call "g" [constInt -1]))
       Pause
       TextBlock @"We expect something with a \texttt{drive} method, but get an integer instead"
       ]
@@ -129,10 +140,10 @@ let slides =
 
     VerticalStack[
       Question @"How many times would we need to test to be sure there is no error?"
-      PythonCodeBlock(
-          ifelse (call "randint" [constInt 0; constInt 100000] .> constInt 99999)
+      PythonCodeBlock(TextSize.Normal,
+         (ifelse (call "randint" [constInt 0; constInt 100000] .> constInt 99999)
                  (call "g" [constInt -1])
-                 (call "g" [var "mercedesSL500"]))
+                 (call "g" [var "mercedesSL500"])))
       Pause
       TextBlock ">100000"
       ]
@@ -170,11 +181,11 @@ let slides =
       ]
 
     VerticalStack[
-      PythonCodeBlock(
-          def "f" ["x"] (ret (var "x" .* constInt 2)))
+      PythonCodeBlock(TextSize.Normal,
+          (def "f" ["x"] (ret (var "x" .* constInt 2))))
       TextBlock "Becomes, typed:"
-      CSharpCodeBlock(
-          typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2)))
+      CSharpCodeBlock(TextSize.Normal,
+          (typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2))))
       Question @"What has improved and why?"
       Pause
       TextBlock "The second definition encodes information about what goes in and what comes out of the function"
@@ -182,39 +193,39 @@ let slides =
 
     VerticalStack[
       Question @"Is this possible now?"
-      CSharpCodeBlock(
-          typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2)) >>
-          call "f" [constString "nonsense"])
+      CSharpCodeBlock(TextSize.Normal,
+         (typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2)) >>
+          call "f" [constString "nonsense"]))
       Pause
       TextBlock "No: we get a compiler error because a string cannot be used where a number is expected"
       ]
 
     VerticalStack[
-      PythonCodeBlock(
-          "x" := (call "input" []) >>
+      PythonCodeBlock(TextSize.Normal,
+         ("x" := (call "input" []) >>
           ifelse (var "x" .> constInt 100) 
                  (call "print" [constString "dumb"])
-                 (call "print" [constString "dumber"]))
+                 (call "print" [constString "dumber"])))
       TextBlock "Becomes, typed:"
-      CSharpCodeBlock(
-          typedDecl "x" "int" >>
+      CSharpCodeBlock(TextSize.Normal,
+         (typedDecl "x" "int" >>
           (("x" := (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
            ifelse (var "x" .> constInt 100) 
                   (call "Console.WriteLine" [constString "safe"])
-                  (call "Console.WriteLine" [constString "safer"])))
+                  (call "Console.WriteLine" [constString "safer"]))))
       Question @"What has improved and why?"
       Pause
       TextBlock "The variable declaration specifies what is allowed (and what is not) inside the variable."
       ]
 
     VerticalStack[
-      PythonCodeBlock(
-          def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
-          call "g" [constInt -1])
+      PythonCodeBlock(TextSize.Normal,
+         (def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
+          call "g" [constInt -1]))
       TextBlock "Becomes, typed:"
-      CSharpCodeBlock(
-          typedDef "g" ["Car","car"] "void" (ret (methodCall "car" "drive" [constInt 2])) >>
-          call "g" [constInt -1])
+      CSharpCodeBlock(TextSize.Normal,
+         (typedDef "g" ["Car","car"] "void" (ret (methodCall "car" "drive" [constInt 2])) >>
+          call "g" [constInt -1]))
       Question @"What has improved and why?"
       Pause
       TextBlock "The function declaration specifies available methods of \texttt{car}. We will thus get a compiler error."
@@ -326,29 +337,260 @@ let slides =
           }
         ]])
 
-    PythonStateTrace(
-      (def "f" ["x"] (ret (var "x" .* constInt 2)) >>
-       call "f" [constInt 20] >>
-       endProgram),
-      { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = [] }
-    )
+    Section "Statically typed, object-oriented, modern programming language"
+    SubSection "Introduction and motivation"
+    ItemsBlock
+      [
+        ! @"We will use Java and C\#"
+        ! @"They are extremely similar in philosophy, syntax, type system, and semantics"
+        ! @"Each one apart is somewhat limited"
+        ! @"Together they cover a huge chunk of theory and practical applications"
+      ]
+
+    SubSection "Pros"
+    VerticalStack[
+      TextBlock "Java"
+      Items
+        [
+          ! @"Hugely used in businesses"
+          ! @"Immense ecosystem of tools and libraries"
+          ! @"Great support on most platforms"
+        ]
+      TextBlock @"C\#"
+      Items
+        [
+          ! @"Dominant in semi-high performance applications (games, simulations)"
+          ! @"Extremely clean and careful design of libraries and advanced language constructs"
+          ! @"Good support on most platform"
+        ]
+      ]
+
+    SubSection "Cons"
+    VerticalStack[
+      TextBlock "Java"
+      Items
+        [
+          ! @"Very slow to evolve"
+          ! @"Less clean design with lots of historical corner cases"
+          ! @"Too large a community means dozens of competing libraries for most common tasks"
+        ]
+      TextBlock @"C\#"
+      Items
+        [
+          ! @"Less adopted outside the Microsoft world, though Mono and .Net Core are helping"
+          ! @"Historical bad perception of the whole company polluted language reputation"
+          ! @"No immense collection of competing libraries and build systems"
+        ]
+      ]
+
+    SubSection "Practicum and assignments"
+    Items
+      [
+        ! @"Just choose whatever you like the most"
+        ! @"Both languages and all supported libraries are accepted"
+        ! @"Moreover, the differences between the two are minimal: learn one, but be aware that you are also learning the other"
+        ! @"We will point the differences out whenever needed"
+      ]
+
+    Section @"From Python to Java/C\#"
+    SubSection "Where does the program go?"
+    ItemsBlock
+      [
+        ! @"In Python you can just begin writing code anywhere in a file"
+        ! @"This will not be true anymore in Java/C\#"
+        ! @"Separate snippets of code cannot be just pasted in an empty file and tried out"
+      ]
+
+    VerticalStack[
+      Small
+
+      ItemsBlock[ 
+        ! @"Most basic Python constructs translate almost directly to JC\#"
+        ! @"Lines and instructions always end with a semicolon (;)"
+        ! @"Variables are always declared before use, specifying their type."
+      ]
+
+      PythonCodeBlock(TextSize.Small,
+          ("x" := (constInt 10 .+ constInt 20)))
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Small,
+          (typedDecl "x" "int" >>
+           ("x" := (constInt 10 .+ constInt 20))))
+
+      TextBlock @"or, alternatively:"
+
+      CSharpCodeBlock(TextSize.Small,
+          (typedDeclAndInit "x" "int" (constInt 10 .+ constInt 20)))
+    ]
+
+    VerticalStack[
+      TextBlock @"JC\# support similar sets of primitive data types"
+
+      ItemsBlock[ 
+        ! @"integers in various sizes: \texttt{byte}, \texttt{short}, \texttt{int}, \texttt{long}, and many others"
+        ! @"floats in various sizes: \texttt{float} and \texttt{double}"
+        ! @"strings: \texttt{string}"
+      ]
+
+      TextBlock @"These types are richer than Python, because we can specify their size, and thus precision, instead of the one-size-fits-all solution of Python"
+    ]
+
+    VerticalStack[
+      TextBlock @"Each primitive data type has a different range and uses more or less memory"
+
+      ItemsBlock[ 
+        ! @"\texttt{byte} is 1 byte, and it goes from -128 to 127"
+        ! @"\texttt{short} is 2 bytes, and it goes from -32,768 to 32,767"
+        ! @"\texttt{int} is 4 bytes, and it goes from $-2^{31}$ to $2^{31}-1$"
+        ! @"\texttt{float} is 4 bytes, and it has a very wide range \textbf{with non-uniform steps between adjacent values!}$"
+        ! "..."
+      ]
+
+      TextBlock @"Some bugs may depend on attempts to write beyond the range or at a higher precision than supported by the type."
+    ]
+
+    VerticalStack[
+      Small
+
+      ItemsBlock[ 
+        ! @"Python operators translate almost directly to JC\#"
+        ! @"Only exception are the logical operators"
+        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($\|$), and \texttt{and} becomes (\&\&)"
+      ]
+
+      PythonCodeBlock(TextSize.Small,
+          ("b" := ((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5))
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Small,
+          (typedDeclAndInit "b" "bool" ((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5))
+    ]
+
+    VerticalStack[
+      Small
+
+      ItemsBlock[ 
+        ! @"Python function calls translate directly to JC\#"
+        ! @"Only difference is, again, the semicolon"
+        ! @"Behaviour remains precisely the same"
+      ]
+
+      PythonCodeBlock(TextSize.Tiny,
+        (call "print" [call "int" [(call "input" [])]]))
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+        (call "print" [call "Int32.Parse" [(call "Console.ReadLine" [])]]))
+    ]
+
+    ItemsBlock
+      [
+        ! @"Java and C\#\footnote{From now on JC\#} are curly-bracket languages"
+        ! @"This means that any block of code must now appear between curly brackets \{ and \}"
+        ! @"There are no more colons (:) to delimit declarations"
+        ! @"Indentation remains important for the reader\footnote{And the student aiming for a passing grade!}, but the languages do not care"
+        ! @"Programs in JC\# tend to be longer in part because of this"
+      ]
+
+    VerticalStack[
+      Small
+
+      ItemsBlock[ 
+        ! @"Python statements translate almost directly to JC\#"
+        ! @"Only difference are the brackets and the lack of semicolon"
+        ! @"Behaviour remains precisely the same"
+      ]
+
+      PythonCodeBlock(TextSize.Tiny,
+        ("x" := (call "int" [(call "input" [])])) >>
+        (ifelse (var "x" .> constInt 0) 
+          ((call "print" [constString "greater"]))
+          ((call "print" [constString "smaller"]))))
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+        (typedDeclAndInit "x" "int" (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
+        (ifelse (var "x" .> constInt 0) 
+          (call "Console.WriteLine" [constString "greater"])
+          (call "Console.WriteLine" [constString "smaller"])))
+    ]
+
+    VerticalStack[
+      Small
+
+      PythonCodeBlock(TextSize.Tiny,
+        ("x" := (call "int" [(call "input" [])])) >>
+         (("cnt" := constInt 0) >>
+          (whiledo (var "x" .> constInt 0) 
+            (("cnt" := (var "cnt" .+ constInt 1)) >>
+             ("x" := (var "x" ./ constInt 2))))))
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+        (typedDeclAndInit "x" "int" (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
+         ((typedDeclAndInit "cnt" "int" (constInt 0)) >>
+          (whiledo (var "x" .> constInt 0) 
+            (("cnt" := (var "cnt" .+ constInt 1)) >>
+             ("x" := (var "x" ./ constInt 2))))))
+    ]
+
+    ItemsBlock
+      [
+        ! @"JC\# are object-oriented languages"
+        ! @"This means that (almost) everything is an \textbf{object}, that is an instance of a \textbf{class}"
+        ! @"All JC\# programs will therefore begin with a class definition"
+      ]
+
+    VerticalStack[
+      TextBlock @"A class in JC\# looks very much like a Python class, where init is a method with the name of the class itself and fields must be declared, like variables, within the body of the class."
+
+      PythonCodeBlock(TextSize.Tiny,
+          classDef "Counter" 
+            [
+              def "__init__" ["self"] ("self.cnt" := constInt 0)
+            ])
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          classDef "Counter" 
+            [
+              typedDecl "cnt" "int"
+              typedDef "Counter" [] "" ("cnt" := constInt 0)
+            ])
+    ]
+
+    VerticalStack[
+      TextBlock @"If we want to add methods, we also need to be aware of the type of each of their parameter and of the type they return."
+
+      PythonCodeBlock(TextSize.Tiny,
+          classDef "Counter" 
+            [
+              def "__init__" ["self"] ("self.cnt" := constInt 0)
+              def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
+            ])
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          classDef "Counter" 
+            [
+              typedDecl "cnt" "int"
+              typedDef "Counter" [] "" ("cnt" := constInt 0)
+              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+            ])
+    ]
 
 //Statically typed, object-oriented programming languages
-//We will use Java and C\#
-//Java: some pros and cons
-//C\#: some pros and cons
-//Assignment can be done in either of the languages
-//Why both? Extremely used, together they cover a lot of possible very different applications on the most popular platforms.
-//
-//
-//From Python to Java/C\#
-//Always put semantics and typing information when needed
-//Classes
+//Arrays as primitive data types
+//Instancing classes, calling methods, and calling static methods
 //Static methods (main)
-//Variables, statements, function calls, primitive data types (also arrays)
-//Fields
-//Methods
-//Constructors
 //\textbf{Advanced} lambda's
 //
 //

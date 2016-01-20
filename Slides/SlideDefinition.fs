@@ -13,12 +13,15 @@ type SlideElement =
   | Text of string
   | Block of SlideElement
   | Items of List<SlideElement>
-  | PythonCodeBlock of Code
+  | PythonCodeBlock of TextSize * Code
+  | CSharpCodeBlock of TextSize *Code
   | Tiny
+  | Small
+  | Normal
+  | Large
   | TypingRules of List<TypingRule>
-  | CSharpCodeBlock of Code
   | VerticalStack of List<SlideElement>
-  | PythonStateTrace of Code * RuntimeState
+  | PythonStateTrace of TextSize * Code * RuntimeState
   with
     member this.ToStringAsElement() = 
       match this with
@@ -28,14 +31,19 @@ type SlideElement =
       | InlineCode c -> sprintf @"\texttt{%s}" c
       | Text t -> t
       | Tiny -> sprintf "\\tiny\n"
+      | Small -> sprintf "\\small\n"
+      | Normal -> sprintf "\\normal\n"
+      | Large -> sprintf "\\large\n"
       | Block t ->
           sprintf @"%s%s%s" beginExampleBlock (t.ToStringAsElement()) endExampleBlock
       | Items items ->
           sprintf @"%s%s%s" beginItemize (items |> Seq.map(function | Pause -> @"\pause" | item -> @"\item " + item.ToStringAsElement() + "\n") |> Seq.fold (+) "" ) endItemize
-      | PythonCodeBlock c ->
-          sprintf @"%s%s%s" beginCode (c.AsPython "") endCode
-      | CSharpCodeBlock c ->
-          sprintf @"%s%s%s" beginCode (c.AsCSharp "") endCode
+      | PythonCodeBlock (ts,c) ->
+          let textSize = ts.ToString()
+          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.AsPython "") endCode
+      | CSharpCodeBlock (ts,c) ->
+          let textSize = ts.ToString()
+          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "[Sharp]C") (c.AsCSharp "") endCode
       | TypingRules tr ->
           let trs = tr |> List.map (fun t -> t.ToString())
           (List.fold (+) "" trs)
@@ -59,27 +67,30 @@ type SlideElement =
       | Question q ->
           sprintf @"%s%s%s" beginFrame (this.ToStringAsElement()) endFrame
       | InlineCode c ->
-          sprintf @"%s\texttt{%s}%s" beginCode c endCode
+          sprintf @"%s\texttt{%s}%s" (beginCode "Python") c endCode
       | Text t -> t
       | Items items ->
           sprintf @"%s%s%s%s%s" beginFrame beginItemize (items |> Seq.map(function | Pause -> @"\pause" | item -> @"\item " + item.ToStringAsElement() + "\n") |> Seq.fold (+) "") endItemize endFrame
-      | PythonCodeBlock c ->
-          sprintf @"%s%s%s%s%s" beginFrame beginCode (c.AsPython "") endCode endFrame
-      | CSharpCodeBlock c ->
-          sprintf @"%s%s%s%s%s" beginFrame beginCode (c.AsCSharp "") endCode endFrame
+      | PythonCodeBlock (ts,c) ->
+          let textSize = ts.ToString()
+          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.AsPython "") endCode endFrame
+      | CSharpCodeBlock (ts,c) ->
+          let textSize = ts.ToString()
+          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C")  (c.AsCSharp "") endCode endFrame
       | TypingRules tr ->
           let trs = tr |> List.map (fun t -> t.ToString())
           sprintf @"%s%s%s" beginFrame (List.fold (+) "" trs) endFrame
       | VerticalStack ses ->
           let sess = ses |> List.map (fun se -> se.ToStringAsElement() + " \n")
           sprintf @"%s%s%s" beginFrame (List.fold (+) "" sess) endFrame
-      | PythonStateTrace(p,st) ->
+      | PythonStateTrace(ts,p,st) ->
+        let textSize = ts.ToString()
         let stackTraces = st :: runToEnd (runPython p) st
         let ps = (p.AsPython "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
             let stack,heap = st.AsSlideContent
-            let slide = sprintf @"%s%s%s%s%s%s%s" beginFrame beginCode ps endCode stack heap endFrame
+            let slide = sprintf "%s%s%s%s\n%s%s%s%s" beginFrame (beginCode "Python") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | _ -> failwith "Unsupported"
