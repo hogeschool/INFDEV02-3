@@ -1,23 +1,13 @@
 package assignment4;
 
-public abstract class Wheel implements PowerTrainComponent {
-    private float radius;
+public interface Wheel extends PowerTrainComponent {
+    float CENTIMETERS_PER_INCH = 2.54f;
 
-    public static final float CENTIMETERS_PER_INCH = 2.54f;
+    float getRadius();
 
-    float getRadius(){
-        return radius;
-    }
+    void setRadius(float radius);
 
-    public void setRadius(float radius) {
-        this.radius = radius;
-    }
+    float getRadiusInCentimeters();
 
-    public float getRadiusInCentimeters(){
-        return getRadius() * CENTIMETERS_PER_INCH;
-    }
-
-    public float turn(float gearboxRPM){
-        return gearboxRPM * getRadiusInCentimeters();
-    }
+    float turn(float gearboxRPM);
 }

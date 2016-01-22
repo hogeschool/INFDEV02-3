@@ -3,7 +3,7 @@ package assignment4;
 import java.time.Duration;
 import java.util.List;
 
-public class Auto extends Entity{
+public class Auto implements Entity{
     Position positionX;
     FuelTank fuelTank;
     Engine engine;
@@ -21,10 +21,6 @@ public class Auto extends Entity{
     @Override
     public Position getPositionX() {
         return positionX;
-    }
-
-    public void setPositionX(Position positionX) {
-        this.positionX = positionX;
     }
 
     public void drive(Duration duration){

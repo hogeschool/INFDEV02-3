@@ -1,18 +1,8 @@
 package assignment4;
 
-public abstract class Engine implements PowerTrainComponent {
-    int cylinders;
-    int horsePower;
+public interface Engine extends PowerTrainComponent {
+    int getCylinders();
+    int getHorsePower();
 
-    int getCylinders(){
-        return cylinders;
-    }
-
-    int getHorsePower(){
-        return horsePower;
-    }
-
-    float burn(float litersOfFuel){
-        return turn(litersOfFuel);
-    };
+    float burn(float litersOfFuel);
 }
