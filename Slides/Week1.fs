@@ -6,6 +6,28 @@ open CodeDefinition
 
 let slides = 
   [
+    PythonStateTrace(TextSize.FootnoteSize,
+          ((classDef "Counter" 
+              [
+                def "__init__" ["self"] ("self.cnt" := constInt 0)
+                def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
+              ]) >>
+            ((("c" := newC "Counter" []) >>
+              (methodCall "c" "incr" [ConstInt 5])) >>
+              endProgram)),
+          { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = []; HeapSize = 1 })
+
+//    CSharpCodeBlock(TextSize.FootnoteSize,
+//        (classDef "Counter" 
+//          [
+//            typedDecl "cnt" "int"
+//            typedDef "Counter" [] "" ("cnt" := constInt 0)
+//            typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+//          ]) >>
+//        (((typedDeclAndInit "c" "Counter" (newC "Counter" [ConstInt 5])) >>
+//          (methodCall "c" "incr" []))))
+//
+
 //    PythonStateTrace(TextSize.Small,
 //      (def "f" ["x"] 
 //        (ifelse (var "x" .> constInt 0) 
@@ -337,7 +359,7 @@ let slides =
           }
         ]])
 
-    Section "Statically typed, object-oriented, modern programming language"
+    Section "Statically typed, object-oriented, modern programming languages"
     SubSection "Introduction and motivation"
     ItemsBlock
       [
@@ -350,14 +372,14 @@ let slides =
     SubSection "Pros"
     VerticalStack[
       TextBlock "Java"
-      Items
+      ItemsBlock
         [
           ! @"Hugely used in businesses"
           ! @"Immense ecosystem of tools and libraries"
           ! @"Great support on most platforms"
         ]
       TextBlock @"C\#"
-      Items
+      ItemsBlock
         [
           ! @"Dominant in semi-high performance applications (games, simulations)"
           ! @"Extremely clean and careful design of libraries and advanced language constructs"
@@ -368,14 +390,14 @@ let slides =
     SubSection "Cons"
     VerticalStack[
       TextBlock "Java"
-      Items
+      ItemsBlock
         [
           ! @"Very slow to evolve"
           ! @"Less clean design with lots of historical corner cases"
           ! @"Too large a community means dozens of competing libraries for most common tasks"
         ]
       TextBlock @"C\#"
-      Items
+      ItemsBlock
         [
           ! @"Less adopted outside the Microsoft world, though Mono and .Net Core are helping"
           ! @"Historical bad perception of the whole company polluted language reputation"
@@ -384,7 +406,7 @@ let slides =
       ]
 
     SubSection "Practicum and assignments"
-    Items
+    ItemsBlock
       [
         ! @"Just choose whatever you like the most"
         ! @"Both languages and all supported libraries are accepted"
@@ -587,10 +609,36 @@ let slides =
             ])
     ]
 
+    VerticalStack[
+      TextBlock @"Now that we have a class, we can instantiate it and call its methods."
+
+      PythonCodeBlock(TextSize.Tiny,
+          (classDef "Counter" 
+            [
+              def "__init__" ["self"] ("self.cnt" := constInt 0)
+              def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
+            ]) >>
+          ((("c" := newC "Counter" []) >>
+            (methodCall "c" "incr" []))))
+
+      TextBlock @"The above Python becomes, in both JC\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          (classDef "Counter" 
+            [
+              typedDecl "cnt" "int"
+              typedDef "Counter" [] "" ("cnt" := constInt 0)
+              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+            ]) >>
+          (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
+            (methodCall "c" "incr" []))))
+    ]
+
 //Statically typed, object-oriented programming languages
 //Arrays as primitive data types
-//Instancing classes, calling methods, and calling static methods
-//Static methods (main)
+//Static methods
+//calling static methods
+//main
 //\textbf{Advanced} lambda's
 //Add Java examples as well, with keywords for specific translation later instead of strings for the methods
 //The Java examples appear after C# in a new slide, right beneath the C# example

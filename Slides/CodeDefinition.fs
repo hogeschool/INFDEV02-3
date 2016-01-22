@@ -20,6 +20,9 @@ let (!+) = List.fold (+) ""
 type Code =
   | End
   | None
+  | Ref of string
+  | Object of Map<string, Code>
+  | New of string * List<Code>
   | ClassDef of string * List<Code>
   | Return of Code
   | TypedDecl of string * string * Option<Code>
@@ -35,6 +38,7 @@ type Code =
   | Def of string * List<string> * Code
   | Call of string * List<Code>
   | MethodCall of string * string * List<Code>
+  | StaticMethodCall of string * string * List<Code>
   | If of Code * Code * Code
   | While of Code * Code
   | Op of Code * Operator * Code
@@ -42,11 +46,14 @@ type Code =
   with 
     member this.AsPython pre = 
       match this with
+      | Object bs ->
+        let argss = bs |> Map.remove "__type" |> Seq.map (fun a -> a.Key + "=" + (a.Value.AsPython "") + ", ") |> Seq.toList
+        sprintf "%s%s" pre ((!+argss).TrimEnd[|','; ' '|])
       | End -> ""
       | None -> "None"
       | ClassDef(s,ms) -> 
         let mss = ms |> List.map (fun m -> m.AsPython (pre + "  ") + "\n")
-        sprintf "class %s:\n%s\n" s !+mss
+        sprintf "class %s:\n%s" s !+mss
       | Return c ->
         sprintf "%sreturn %s\n" pre ((c.AsPython "").Replace("\n",""))
       | Var s -> s
@@ -54,6 +61,7 @@ type Code =
       | ConstInt i -> i.ToString()
       | ConstFloat f -> f.ToString()
       | ConstString s -> sprintf "\"%s\"" s
+      | Ref s -> sprintf "ref %s" s
       | Assign (v,c) -> sprintf "%s%s = %s\n" pre v ((c.AsPython "").TrimEnd([|'\n'|]))
       | ConstLambda (pc,args,body) ->
         let argss = args |> List.map (fun a -> a + ",")
@@ -61,12 +69,18 @@ type Code =
       | Def (n,args,body) ->
         let argss = args |> List.map (fun a -> a + ",")
         sprintf "%sdef %s(%s):\n%s" pre n ((!+argss).TrimEnd[|','|]) (body.AsPython (pre + "  "))
+      | New(c,args) ->
+        let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
+        sprintf "%s%s(%s)\n" pre c ((!+argss).TrimEnd[|','|])
       | Call(n,args) ->
         let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
         sprintf "%s%s(%s)\n" pre n ((!+argss).TrimEnd[|','|])
       | MethodCall(n,m,args) ->
         let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
         sprintf "%s%s.%s(%s)\n" pre n m ((!+argss).TrimEnd[|','|])
+      | StaticMethodCall(c,m,args) ->
+        let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
+        sprintf "%s%s.%s(%s)\n" pre c m ((!+argss).TrimEnd[|','|])
       | If(c,t,e) ->
         let tS = (t.AsPython (pre + "  "))
         sprintf "%sif %s:\n%s%selse:\n%s" pre (c.AsPython "") tS pre (e.AsPython (pre + "  "))
@@ -74,7 +88,7 @@ type Code =
         let bs = (b.AsPython (pre + "  "))
         sprintf "%swhile %s:\n%s" pre (c.AsPython "") bs
       | Op(a,op,b) ->
-        sprintf "%s%s%s" ((a.AsPython "").Replace("\n","")) (op.AsPython) ((b.AsPython (pre + "  ")).Replace("\n",""))
+        sprintf "%s %s %s" ((a.AsPython "").Replace("\n","")) (op.AsPython) ((b.AsPython (pre + "  ")).Replace("\n",""))
       | Sequence (p,q) ->
         let res = sprintf "%s%s" (p.AsPython pre) (q.AsPython pre)
         res
@@ -106,6 +120,7 @@ type Code =
       | ConstInt i -> i.ToString()
       | ConstFloat f -> f.ToString()
       | ConstString s -> sprintf "\"%s\"" s
+      | Ref s -> sprintf "ref %s" s
       | Assign (v,c) -> sprintf "%s%s = %s;\n" pre v ((c.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
       | ConstLambda (pc,args,body) ->
         let argss = args |> List.map (fun a -> a + ",")
@@ -114,18 +129,24 @@ type Code =
         let argss = args |> List.map (fun (t,a) -> t + " " + a + ",")
         (if t = "" then sprintf "%s%s(%s) {\n%s%s}\n" pre n
          else sprintf "%s%s %s(%s) {\n%s%s}\n" pre t n) ((!+argss).TrimEnd[|','; '\n'|]) (body.AsCSharp (pre + "  ")) pre
+      | New(c,args) ->
+        let argss = args |> List.map (fun a -> ((a.AsCSharp "").TrimEnd[|','; '\n'; ';'|]) + ",")
+        sprintf "%snew %s(%s);\n" pre c ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | Call(n,args) ->
         let argss = args |> List.map (fun a -> ((a.AsCSharp "").TrimEnd[|','; '\n'; ';'|]) + ",")
         sprintf "%s%s(%s);\n" pre n ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | MethodCall(n,m,args) ->
         let argss = args |> List.map (fun a -> ((a.AsCSharp "").TrimEnd[|','; '\n'; ';'|]) + ",")
         sprintf "%s%s.%s(%s);\n" pre n m ((!+argss).TrimEnd[|','; '\n'; ';'|])
+      | StaticMethodCall(c,m,args) ->
+        let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
+        sprintf "%s%s.%s(%s)\n" pre c m ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | If(c,t,e) ->
         sprintf "%sif(%s) {\n%s } else {\n%s }" pre (c.AsCSharp "") (t.AsCSharp (pre + "  ")) (e.AsCSharp (pre + "  "))
       | While(c,b) ->
         sprintf "%swhile(%s) {\n%s }" pre (c.AsCSharp "") (b.AsCSharp (pre + "  "))
       | Op(a,op,b) ->
-        sprintf "%s%s%s" ((a.AsCSharp "").Replace("\n","").Replace(";","")) (op.AsCSharp) ((b.AsCSharp (pre + "  ")).Replace("\n","").Replace(";",""))
+        sprintf "%s %s %s" ((a.AsCSharp "").Replace("\n","").Replace(";","")) (op.AsCSharp) ((b.AsCSharp (pre + "  ")).Replace("\n","").Replace(";",""))
       | Sequence (p,q) ->
         sprintf "%s%s" (p.AsCSharp pre) (q.AsCSharp pre)
       | _ -> failwith "Unsupported Python statement"
@@ -144,14 +165,13 @@ let printBindings (b:Map<string, Code>) =
   let innerValues = [ for x in entries do yield x.Value ]
   let names = (match ret with | Option.None -> innerNames | _ -> "ret" :: innerNames)
   let values = (match ret with | Option.None -> innerValues | Some x -> x :: innerValues)
-  let names = (match pc with | Option.None -> innerNames | _ -> "PC" :: innerNames)
-  let values = (match pc  with | Option.None -> innerValues | Some x -> x :: innerValues)
+  let names = (match pc with | Option.None -> names | _ -> "PC" :: names)
+  let values = (match pc  with | Option.None -> values | Some x -> x :: values)
   let allNames = if names |> List.isEmpty then "" else names |> List.reduce (fun a b -> a + " & " + b)
   let allValues = if values |> List.isEmpty then "" else values |> List.map (fun v -> v.AsPython "") |> List.reduce (fun a b -> a + " & " + b)
   allNames,allValues
 
-
-type RuntimeState = { Stack : List<Map<string, Code>>; Heap : Map<string, Code>; InputStream : List<Code> }
+type RuntimeState = { Stack : List<Map<string, Code>>; HeapSize : int; Heap : Map<string, Code>; InputStream : List<Code> }
   with 
     member this.AsSlideContent =
       let stackFrames = 
@@ -179,11 +199,63 @@ type RuntimeState = { Stack : List<Map<string, Code>>; Heap : Map<string, Code>;
       stackTable, heap
 
 
-let rec lookup (s:List<Map<string, Code>>) v =
-  match s with
-  | [] -> failwith "Cannot find variable in empty stack"
-  | c :: rs when c |> Map.containsKey v -> c.[v]
-  | _ -> (s |> List.rev |> List.head).[v]
+let lookup (s:RuntimeState) (v:string) =
+  let rec lookupHeap (h:Map<string, Code>) vs =
+    match vs with
+    | [] -> failwith "Empty lookup string"
+    | [v] ->
+      h.[v]
+    | v::vs ->
+      match h.[v] with
+      | Hidden(Object(bs)) | Object(bs) ->
+        lookupHeap bs vs
+      | _ -> failwithf "Cannot find %s" v
+
+  let vs = v.Split([|'.'|]) |> Seq.toList
+  let y = 
+    match s.Stack with
+    | [] -> failwith "Cannot find variable in empty stack"
+    | c :: rs when c |> Map.containsKey vs.Head -> c.[vs.Head]
+    | _ -> (s.Stack |> List.rev |> List.head).[vs.Head]
+  match y,vs with
+  | _,[v] -> y
+  | Ref r,v::vs ->
+    match s.Heap.[r] with
+    | Object(bs) | Hidden(Object(bs)) ->
+      lookupHeap bs vs
+    | _ -> failwith "Lookup on non-object value."
+  | _ -> failwith "Malformed lookup"
+
+let store (s:RuntimeState) (v:string) (y:Code) : RuntimeState =
+  let rec storeHeap (bs:Map<string,Code>) (vs:List<string>) : Map<string,Code> =
+    match vs with
+    | [] -> bs
+    | [v] -> bs |> Map.add v y
+    | v::vs ->
+      match bs.[v] with
+      | Object(bs_inner) | Hidden(Object(bs_inner)) ->
+        let k = match bs.[v] with | Object(bs_inner) -> id | _ -> Hidden
+        bs |> Map.add v (k(Object(storeHeap bs_inner vs)))
+      | _ -> failwith "..."
+
+  let vs = (v.Split([|'.'|]) |> Seq.toList)
+  match vs with
+  | [v] -> 
+    match s.Stack with
+    | c :: rs -> { s with Stack = (c |> Map.add v y) :: rs }
+    | [] -> failwith "Cannot find variable in empty stack"
+  | v::vs ->
+    match s.Stack.Head.[v] with
+    | Ref r ->
+      match s.Heap.[r] with
+      | Object(bs) | Hidden(Object(bs)) ->
+        let k = match s.Heap.[r] with | Object(bs_inner) -> id | _ -> Hidden
+        { s with Heap = s.Heap |> Map.add r (k(Object(storeHeap bs vs))) }
+      | _ -> failwith "Malformed assignment"
+    | _ -> failwith "Cannot lookup a non-ref object"
+  | _ -> failwith "Malformed assignment"
+
+
 
 let getPC =
   co{
@@ -214,9 +286,11 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
     match p with
     | Hidden c -> 
       return! runPython c
+    | Ref _ as r ->
+      return r
     | Var v -> 
       let! s = getState
-      return lookup s.Stack v
+      return lookup s v
     | ConstInt i ->
       return ConstInt i
     | ConstFloat f ->
@@ -226,18 +300,15 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
     | Assign (v,e) ->
       let! res = runPython e
       let! s = getState
-      match s.Stack with
-      | c::rs ->
-        let c' = c |> Map.add v res
-        do! setState { s with Stack = c :: rs }
-        return None
-      | _ -> return failwith "Cannot assign variable on empty stack"
+      let s_new = store s v res
+      do! setState s_new
+      return None
     | Return e ->
       let! res = runPython e
       let! s = getState
       match s.Stack with
       | c::rs ->
-        do! setState { s with Stack = (Map.empty |> Map.add "PC" c.["PC"] |> Map.add "res" res) :: rs }
+        do! setState { s with Stack = (Map.empty |> Map.add "PC" c.["PC"] |> Map.add "ret" res) :: rs }
         do! pause
         do! setState { s with Stack = rs }
         return res
@@ -247,18 +318,15 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
       let nl = body.NumberOfPythonLines
       do! changePC ((+) nl)
       let! s = getState
-      match s.Stack with
-      | c::rs ->
-        do! setState { s with Stack = (c |> Map.add f (Hidden(ConstLambda(pc+1,args,body)))) :: rs }
-        return None
-      | _ -> return failwith "Cannot return from empty stack"
+      do! setState { s with Heap = (s.Heap |> Map.add f (Hidden(ConstLambda(pc+1,args,body)))) }
+      return Assign(f, ConstLambda(pc+1,args,body))
     | Call(f,argExprs) ->
       let! argVals = argExprs |> mapCo runPython
       let! s = getState
-      match lookup s.Stack f with
+      match lookup s f with
       | Hidden(ConstLambda(pc,argNames,body))
       | ConstLambda(pc,argNames,body) ->
-        let c = Seq.zip argNames argVals |> Map.ofSeq |> Map.add "PC" (ConstInt pc) |> Map.add "res" None
+        let c = Seq.zip argNames argVals |> Map.ofSeq |> Map.add "PC" (ConstInt pc) |> Map.add "ret" None
         do! setState { s with Stack = c :: s.Stack }
         do! pause
         return! runPython body
@@ -290,17 +358,91 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
       do! pause
       return! runPython k
     | End -> return None
+    | ClassDef (n,ms) as cls ->
+      let! pc = getPC
+      let! s = getState
+      let! msVals = ms |> mapCo runPython
+      let mutable m_pc = pc + 1
+      let msValsByName = 
+        [
+          for m in msVals do
+            match m with
+            | Assign(f,ConstLambda(_,args,body)) -> 
+              let pc = m_pc + 1
+              m_pc <- m_pc + 2 + body.NumberOfPythonLines
+              yield f,ConstLambda(pc,args,body)
+            | _ -> failwithf "Malformed method definition in class %s" n
+        ] |> Map.ofList
+      do! setState { s with Heap = (s.Heap |> Map.add n (Hidden(Object(msValsByName |> Map.add "name" (ConstString n))))) }
+      let nl = cls.NumberOfPythonLines
+      do! changePC ((+) nl)
+      return None
+    | StaticMethodCall(c,m,argExprs) ->
+      let! s = getState
+      match s.Heap.[c] with
+      | Hidden(Object(ms)) 
+      | Object(ms) ->
+        let! argVals = argExprs |> mapCo runPython
+        let! s = getState
+        match ms.[m] with
+        | Hidden(ConstLambda(pc,argNames,body))
+        | ConstLambda(pc,argNames,body) ->
+          let c = Seq.zip argNames argVals |> Map.ofSeq |> Map.add "PC" (ConstInt pc) |> Map.add "ret" None
+          do! setState { s with Stack = c :: s.Stack }
+          do! pause
+          let! res = runPython body
+          match res with
+          | None -> // automatically returned, pop stack frame here
+            let! s = getState
+            do! setState { s with Stack = (Map.empty |> Map.add "PC" s.Stack.Head.["PC"] |> Map.add "ret" res) :: s.Stack.Tail }
+            do! pause
+            do! setState { s with Stack = s.Stack.Tail }
+            return res
+          | _ -> 
+            return res
+        | _ -> return failwithf "Cannot call method %s on %s as it is not an object" m c
+      | _ -> return failwithf "Cannot find class %s" c
+    | MethodCall(v,m,argExprs) ->
+      let! s = getState
+      match lookup s v with
+      | Ref v_ref as v_val ->
+        match s.Heap.[v_ref] with
+        | Hidden(Object(bs))
+        | Object(bs) as o ->
+          match bs.["__type"] with
+          | Ref(c_name) ->
+            match s.Heap.[c_name] with
+            | Hidden(Object(ms)) | Object(ms) ->
+              match ms.["name"] with
+              | ConstString v_type_name ->
+                return! runPython (StaticMethodCall(v_type_name, m, v_val :: argExprs))
+              | _ -> return failwith ""
+            | _ -> return failwith ""
+          | _ -> return failwith ""
+        | _ -> return failwith ""
+      | _ -> return failwith ""
+    | New(c,argExprs) ->
+      let! s = getState
+      match s.Heap.[c] with
+      | Hidden(Object(ms))
+      | Object(ms) as o ->
+        let self = Object (Map.empty |> Map.add "__type" (Ref c))
+        let self_ref_id = s.HeapSize.ToString()
+        let self_ref = Ref self_ref_id
+        do! setState { s with Stack = s.Stack; Heap = s.Heap |> Map.add self_ref_id self; HeapSize = s.HeapSize + 1 }
+        do! pause
+        let! bodyRes = runPython (StaticMethodCall(c, "__init__", self_ref :: argExprs))
+        return self_ref
+      | _ -> return failwithf "Cannot find class %s" c
     | c -> return failwithf "Unsupported construct %A" c
-//    | ClassDef of string * List<Code>
 //    | TypedVar of string * string
 //    | TypedDef of string * List<string * string> * string * Code
-//    | MethodCall of string * string * List<Code>
-//    | If of Code * Code * Code
   }
 
 
 let classDef c m = ClassDef(c,m)
 let (:=) x y = Assign(x,y)
+let newC c a = New(c,a)
 let constInt x = ConstInt(x)
 let constFloat x = ConstFloat(x)
 let constString x = ConstString(x)

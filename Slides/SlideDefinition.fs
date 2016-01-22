@@ -90,7 +90,7 @@ type SlideElement =
         let stackTraceTables = 
           [ for st in stackTraces do 
             let stack,heap = st.AsSlideContent
-            let slide = sprintf "%s%s%s%s\n%s%s%s%s" beginFrame (beginCode "Python") ps endCode textSize stack heap endFrame
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s%s%s%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | _ -> failwith "Unsupported"
