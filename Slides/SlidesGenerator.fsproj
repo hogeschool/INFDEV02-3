@@ -52,6 +52,7 @@
     <Compile Include="CommonLatex.fs" />
     <Compile Include="CodeDefinition.fs" />
     <Compile Include="SlideDefinition.fs" />
+    <Compile Include="StateTraceSamples.fs" />
     <Compile Include="Week1.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

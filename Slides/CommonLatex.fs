@@ -15,8 +15,8 @@ let endMath = @"$$" + "\n"
 
 let beginTabular c = 
   match c with
-  | [] -> @"\begin{tabular}{}" + "\n\\hline"
-  | _ -> @"\begin{tabular}{ | " + (c |> List.reduce (fun a b -> a + " | " + b))  + " | }\n\\hline"
+  | [] -> @"\begin{tabular}{|c|}" + "\n\\hline"
+  | _ -> @"\begin{tabular}{ |" + (c |> List.reduce (fun a b -> a + "|" + b))  + "| }\n\\hline"
 let endTabular = @"\end{tabular}"
 
 type TextSize = FootnoteSize | Tiny | Small | Normal | Large

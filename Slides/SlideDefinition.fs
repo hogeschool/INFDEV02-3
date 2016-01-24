@@ -90,8 +90,8 @@ type SlideElement =
         let ps = (p.AsPython "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
-            let stack,heap = st.AsSlideContent
-            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s%s%s%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap endFrame
+            let stack,heap = st.AsSlideContent (fun c -> c.AsPython)
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\Heap: %s\\%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | CSharpStateTrace(ts,p,st) ->
@@ -100,8 +100,8 @@ type SlideElement =
         let ps = (p.AsCSharp "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
-            let stack,heap = st.AsSlideContent
-            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C") ps endCode textSize stack heap endFrame
+            let stack,heap = st.AsSlideContent (fun c -> c.AsCSharp)
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\Heap: %s\\%s" beginFrame textSize (beginCode "[Sharp]C") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | _ -> failwith "Unsupported"

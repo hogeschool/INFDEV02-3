@@ -23,6 +23,8 @@ type Code =
   | Ref of string
   | Object of Map<string, Code>
   | New of string * List<Code>
+  | Implementation of string
+  | InterfaceDef of string * List<Code>
   | ClassDef of string * List<Code>
   | Return of Code
   | TypedDecl of string * string * Option<Code>
@@ -35,6 +37,7 @@ type Code =
   | ConstString of string
   | Assign of string * Code
   | TypedDef of string * List<string * string> * string * Code
+  | TypedSig of string * List<string * string> * string
   | Def of string * List<string> * Code
   | Call of string * List<Code>
   | MethodCall of string * string * List<Code>
@@ -93,7 +96,7 @@ type Code =
         let res = sprintf "%s%s" (p.AsPython pre) (q.AsPython pre)
         res
       | Hidden(_) -> ""
-      | _ -> failwith "Unsupported Python statement"
+      | s -> failwithf "Unsupported Python statement %A" s
     member this.NumberOfPythonLines = 
       let code = ((this.AsPython ""):string).TrimEnd([|'\n'|])
       let lines = code.Split([|'\n'|])
@@ -101,12 +104,29 @@ type Code =
 
     member this.AsCSharp pre = 
       match this with
+      | Object bs ->
+        let argss = bs |> Map.remove "__type" |> Seq.map (fun a -> a.Key + "=" + (a.Value.AsCSharp "") + ", ") |> Seq.toList
+        sprintf "%s%s" pre ((!+argss).TrimEnd[|','; ' '|])
       | End -> ""
       | None -> "void"
+      | Implementation i -> 
+        ""
+      | InterfaceDef(s,ms) ->
+        let mss = ms |> List.map (fun m -> m.AsCSharp (pre + "  "))
+        let res = sprintf "interface %s {\n%s%s}\n" s (!+mss) pre
+        res        
       | ClassDef(s,ms) -> 
         let mss = ms |> List.map (fun m -> m.AsCSharp (pre + "  "))
-        let res = sprintf "class %s {\n%s%s}\n" s (!+mss) pre
-        res
+        let is = ms |> List.filter (function Implementation _ -> true | _ -> false)
+        match is with
+        | [] ->
+          let res = sprintf "class %s {\n%s%s}\n" s (!+mss) pre
+          res
+        | _ -> 
+          let isNames = is |> List.map (function Implementation i -> i | _ -> failwith "Invalid interface") 
+                           |> List.reduce (fun a b -> a + ", " + b)
+          let res = sprintf "class %s : %s {\n%s%s}\n" s isNames (!+mss) pre
+          res
       | Return c ->
         sprintf "%sreturn %s;\n" pre ((c.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
       | TypedDecl(s,t,Option.None) -> 
@@ -125,6 +145,9 @@ type Code =
       | ConstLambda (pc,args,body) ->
         let argss = args |> List.map (fun a -> a + ",")
         sprintf "%s(%s) => %s" pre ((!+argss).TrimEnd[|','|]) (body.AsCSharp (pre + "  "))
+      | TypedSig (n,args,t) ->
+        let argss = args |> List.map (fun (t,a) -> t + " " + a + ",")
+        sprintf "%s%s %s(%s);\n" pre t n ((!+argss).TrimEnd[|','; '\n'|])
       | TypedDef (n,args,t,body) ->
         let argss = args |> List.map (fun (t,a) -> t + " " + a + ",")
         (if t = "" then sprintf "%s%s(%s) {\n%s%s}\n" pre n
@@ -149,14 +172,15 @@ type Code =
         sprintf "%s %s %s" ((a.AsCSharp "").Replace("\n","").Replace(";","")) (op.AsCSharp) ((b.AsCSharp (pre + "  ")).Replace("\n","").Replace(";",""))
       | Sequence (p,q) ->
         sprintf "%s%s" (p.AsCSharp pre) (q.AsCSharp pre)
-      | _ -> failwith "Unsupported C# statement"
+      | Hidden(_) -> ""
+      | s -> failwithf "Unsupported C# statement %A" s
     member this.NumberOfCSharpLines = 
       let code = ((this.AsCSharp ""):string).TrimEnd([|'\n'|])
       let lines = code.Split([|'\n'|])
       lines.Length
 
 
-let printBindings (b:Map<string, Code>) =
+let printBindings toString (b:Map<string, Code>) =
   let pc = b |> Map.tryFind "PC"
   let ret = b |> Map.tryFind "ret"
   let b' = b |> Map.remove "PC" |> Map.remove "ret"
@@ -168,23 +192,27 @@ let printBindings (b:Map<string, Code>) =
   let names = (match pc with | Option.None -> names | _ -> "PC" :: names)
   let values = (match pc  with | Option.None -> values | Some x -> x :: values)
   let allNames = if names |> List.isEmpty then "" else names |> List.reduce (fun a b -> a + " & " + b)
-  let allValues = if values |> List.isEmpty then "" else values |> List.map (fun v -> v.AsPython "") |> List.reduce (fun a b -> a + " & " + b)
+  let allValues = if values |> List.isEmpty then "" else values |> List.map (fun v -> (toString v) "") |> List.reduce (fun a b -> a + " & " + b)
   allNames,allValues
 
 type RuntimeState = { Stack : List<Map<string, Code>>; HeapSize : int; Heap : Map<string, Code>; InputStream : List<Code> }
   with 
-    member this.AsSlideContent =
+    member this.AsSlideContent toString =
       let stackFrames = 
         [
           for sf in this.Stack do
-          yield printBindings sf 
+          yield printBindings toString sf 
         ] |> List.rev
       let stackNamesByFrame = stackFrames |> List.map fst
       let stackValuesByFrame = stackFrames |> List.map snd
       let stackNames = stackNamesByFrame |> List.reduce (fun a b -> a + " & & " + b)
       let stackValues = stackValuesByFrame |> List.reduce (fun a b -> a + " & & " + b)
 
-      let hd = stackNames |> Seq.map (fun _ -> "c") |> Seq.toList
+      let hd = 
+        [ 
+          for sf in this.Stack do
+            yield [for v in sf do yield "c"]
+        ] |> List.rev |> List.reduce (fun a b -> a @ (@">{\columncolor[gray]{0.8}}c" :: b))
       let stackTableContent = sprintf "%s \\\\\n\\hline\n%s \\\\\n\\hline\n" stackNames stackValues
       let stackTable = sprintf "%s\n%s\n%s\n" (beginTabular hd) stackTableContent endTabular
 
@@ -192,8 +220,8 @@ type RuntimeState = { Stack : List<Map<string, Code>>; HeapSize : int; Heap : Ma
         if this.Heap |> Map.isEmpty then
           ""
         else
-          let hd = this.Heap |> Seq.map (fun _ -> "c") |> Seq.toList
-          let heapNames,heapValues = printBindings this.Heap
+          let heapNames,heapValues = printBindings toString this.Heap
+          let hd = heapNames |> Seq.map (fun _ -> "c") |> Seq.toList
           let heapTableContent = sprintf "%s \\\\\n\\hline\n%s \\\\\n\\hline\n" heapNames heapValues
           sprintf "%s\n%s\n%s" (beginTabular hd) heapTableContent endTabular
       stackTable, heap
@@ -326,7 +354,7 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
     | Call(f,argExprs) ->
       let! argVals = argExprs |> mapCo interpret
       let! s = getState
-      match lookup s f with
+      match s.Heap.[f] with
       | Hidden(ConstLambda(pc,argNames,body))
       | ConstLambda(pc,argNames,body) ->
         let c = Seq.zip argNames argVals |> Map.ofSeq |> Map.add "PC" (ConstInt pc) |> Map.add "ret" None
@@ -361,10 +389,30 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
       do! pause
       return! interpret k
     | End -> return None
+    | Implementation i -> return None
+    | InterfaceDef (n,ms) as intf ->
+      let! pc = getPC
+      let! s = getState
+      let mutable m_pc = pc + 1
+      let msValsByName = 
+        [
+          for m in ms do
+            match m with
+            | TypedSig(f,args,t) -> 
+              let pc = m_pc + 1
+              m_pc <- m_pc + 1
+              yield f,TypedSig(f,args,t)
+            | _ -> 
+              m_pc <- m_pc + 1
+        ] |> Map.ofList
+      do! setState { s with Heap = (s.Heap |> Map.add n (Hidden(Object(msValsByName |> Map.add "__name" (ConstString n))))) }
+      let nl = intf |> numberOfLines
+      do! changePC ((+) (nl - 1))
+      return None
     | ClassDef (n,ms) as cls ->
       let! pc = getPC
       let! s = getState
-      let! msVals = ms |> mapCo interpret
+      let! msVals = ms |> List.filter (function Implementation _ -> false | _ -> true) |> mapCo interpret
       let mutable m_pc = pc + 1
       let fields = ms |> List.filter (function TypedDecl(_) -> true | _ -> false) 
                       |> List.map (fun f -> match f with | TypedDecl(n,t,_) as d -> n,d | _ -> failwith "Malformed field declaration")
@@ -456,6 +504,8 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
 let runPython p = interpret (fun _ args -> args) (fun _ -> "__init__") (fun c -> c.AsPython "") (fun c -> c.NumberOfPythonLines) p
 let runCSharp p = interpret (fun c args -> "this" :: args) id (fun c -> c.AsCSharp "") (fun c -> c.NumberOfCSharpLines) p
 
+let implements i = Implementation(i)
+let interfaceDef c m = InterfaceDef(c,m)
 let classDef c m = ClassDef(c,m)
 let (:=) x y = Assign(x,y)
 let newC c a = New(c,a)
@@ -468,6 +518,7 @@ let var x = Var(x)
 let ret x = Return(x)
 let def x l b = Def(x,l,b)
 let typedDef x l t b = TypedDef(x,l,t,b)
+let typedSig x l t = TypedSig(x,l,t)
 let call x l = Call(x,l)
 let methodCall x m l = MethodCall(x,m,l)
 let ifelse c t e = If(c,t,e)
