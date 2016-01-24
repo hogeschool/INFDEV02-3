@@ -18,7 +18,33 @@ namespace CSharp
       //TestAssignment2Advanced(new Node<Vehicle>(new Car(), new Node<Vehicle>(new Truck(), new Node<Vehicle>(new Enterprise(), new Empty<Vehicle>()))));
       //TestAssignment3();
       //TestAssignment3Advanced();
-      TestAssignment4();
+      //TestAssignment4();
+      TestExtraAssignments();
+    }
+
+    private static void TestExtraAssignments()
+    {
+      //// extra assignment 2
+      //ExtraHomework.Extra2.Program.SumInterval();
+
+      //// extra assignment 3
+      //ExtraHomework.Extra3.Interval i = new ExtraHomework.Extra3.Interval(1, 4);
+      //Console.WriteLine(i.Sum);
+      //Console.WriteLine(i.Product);
+
+      // extra assignments 6, 7, 8, 9
+      //Console.WriteLine(line(new ExtraHomework.Extra6789.IntNumber(), 5, 2, -1));
+      //Console.WriteLine(line(new ExtraHomework.Extra6789.FloatNumber(), 5.0f, 0.5f, -1.0f));
+
+      // extra assignment 10
+      ExtraHomework.Extra10.Interval<float> j = new ExtraHomework.Extra10.Interval<float>(new ExtraHomework.Extra6789.FloatNumber(), 0.5f, 3.5f);
+      Console.WriteLine(j.Sum);
+      Console.WriteLine(j.Product);
+    }
+
+    static N line<N>(ExtraHomework.Extra6789.Number<N> n, N x, N a, N b)
+    {
+      return n.Plus(n.Times(x, a), b);
     }
 
     private static void TestAssignment4()
