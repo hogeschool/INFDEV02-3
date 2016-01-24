@@ -22,6 +22,7 @@ type SlideElement =
   | TypingRules of List<TypingRule>
   | VerticalStack of List<SlideElement>
   | PythonStateTrace of TextSize * Code * RuntimeState
+  | CSharpStateTrace of TextSize * Code * RuntimeState
   with
     member this.ToStringAsElement() = 
       match this with
@@ -91,6 +92,16 @@ type SlideElement =
           [ for st in stackTraces do 
             let stack,heap = st.AsSlideContent
             let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s%s%s%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap endFrame
+            yield slide ]
+        stackTraceTables |> List.fold (+) ""
+      | CSharpStateTrace(ts,p,st) ->
+        let textSize = ts.ToString()
+        let stackTraces = st :: runToEnd (runCSharp p) st
+        let ps = (p.AsCSharp "").TrimEnd([|'\n'|])
+        let stackTraceTables = 
+          [ for st in stackTraces do 
+            let stack,heap = st.AsSlideContent
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | _ -> failwith "Unsupported"

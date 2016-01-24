@@ -52,8 +52,8 @@ type Code =
       | End -> ""
       | None -> "None"
       | ClassDef(s,ms) -> 
-        let mss = ms |> List.map (fun m -> m.AsPython (pre + "  ") + "\n")
-        sprintf "class %s:\n%s" s !+mss
+        let mss = ms |> List.map (fun m -> m.AsPython (pre + "  "))
+        sprintf "class %s:\n%s" s ((!+mss).Replace("\n\n", "\n"))
       | Return c ->
         sprintf "%sreturn %s\n" pre ((c.AsPython "").Replace("\n",""))
       | Var s -> s
@@ -139,7 +139,7 @@ type Code =
         let argss = args |> List.map (fun a -> ((a.AsCSharp "").TrimEnd[|','; '\n'; ';'|]) + ",")
         sprintf "%s%s.%s(%s);\n" pre n m ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | StaticMethodCall(c,m,args) ->
-        let argss = args |> List.map (fun a -> (a.AsPython "").TrimEnd([|'\n'|]) + ",")
+        let argss = args |> List.map (fun a -> (a.AsCSharp "").TrimEnd([|'\n'|]) + ",")
         sprintf "%s%s.%s(%s)\n" pre c m ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | If(c,t,e) ->
         sprintf "%sif(%s) {\n%s } else {\n%s }" pre (c.AsCSharp "") (t.AsCSharp (pre + "  ")) (e.AsCSharp (pre + "  "))
@@ -149,7 +149,7 @@ type Code =
         sprintf "%s %s %s" ((a.AsCSharp "").Replace("\n","").Replace(";","")) (op.AsCSharp) ((b.AsCSharp (pre + "  ")).Replace("\n","").Replace(";",""))
       | Sequence (p,q) ->
         sprintf "%s%s" (p.AsCSharp pre) (q.AsCSharp pre)
-      | _ -> failwith "Unsupported Python statement"
+      | _ -> failwith "Unsupported C# statement"
     member this.NumberOfCSharpLines = 
       let code = ((this.AsCSharp ""):string).TrimEnd([|'\n'|])
       let lines = code.Split([|'\n'|])
@@ -281,11 +281,14 @@ let changePC f =
 
 let incrPC = changePC ((+) 1)
 
-let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
+let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) : Coroutine<RuntimeState,Code> =
+  let interpret = interpret addThisToMethodArgs consName toString numberOfLines
   co{
     match p with
+    | None -> 
+      return None
     | Hidden c -> 
-      return! runPython c
+      return! interpret c
     | Ref _ as r ->
       return r
     | Var v -> 
@@ -298,13 +301,13 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
     | ConstString s ->
       return ConstString s
     | Assign (v,e) ->
-      let! res = runPython e
+      let! res = interpret e
       let! s = getState
       let s_new = store s v res
       do! setState s_new
       return None
     | Return e ->
-      let! res = runPython e
+      let! res = interpret e
       let! s = getState
       match s.Stack with
       | c::rs ->
@@ -315,13 +318,13 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
       | _ -> return failwith "Cannot return from empty stack"
     | Def(f,args,body) ->
       let! pc = getPC
-      let nl = body.NumberOfPythonLines
+      let nl = body |> numberOfLines
       do! changePC ((+) nl)
       let! s = getState
       do! setState { s with Heap = (s.Heap |> Map.add f (Hidden(ConstLambda(pc+1,args,body)))) }
       return Assign(f, ConstLambda(pc+1,args,body))
     | Call(f,argExprs) ->
-      let! argVals = argExprs |> mapCo runPython
+      let! argVals = argExprs |> mapCo interpret
       let! s = getState
       match lookup s f with
       | Hidden(ConstLambda(pc,argNames,body))
@@ -329,11 +332,11 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
         let c = Seq.zip argNames argVals |> Map.ofSeq |> Map.add "PC" (ConstInt pc) |> Map.add "ret" None
         do! setState { s with Stack = c :: s.Stack }
         do! pause
-        return! runPython body
+        return! interpret body
       | _ -> return failwithf "Cannot find function %s" f            
     | Op (a,op,b) -> 
-      let! aVal = runPython a
-      let! bVal = runPython b
+      let! aVal = interpret a
+      let! bVal = interpret b
       match aVal,bVal with
       | ConstInt x, ConstInt y -> 
         match op with
@@ -342,47 +345,51 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
         | Minus -> return ConstInt(x - y)
         | DividedBy -> return ConstInt(x / y)
         | GreaterThan -> return ConstBool(x > y)
-      | _ -> return failwithf "Cannot perform %s %s %s" (a.AsPython "") op.AsPython (b.AsPython "")
+      | _ -> return failwithf "Cannot perform %s %s %s" (toString a) op.AsPython (toString b)
     | If(c,t,e) ->
-      let! cVal = runPython c
+      let! cVal = interpret c
       match cVal with
       | ConstBool true ->
-        return! runPython (Sequence(End,t))
+        return! interpret (Sequence(End,t))
       | ConstBool false ->
-        do! changePC ((+) (t.NumberOfPythonLines + 1))
-        return! runPython (Sequence(End,e))
+        do! changePC ((+) ((t |> numberOfLines) + 1))
+        return! interpret (Sequence(End,e))
       | _ -> return failwith "Malformed if"
     | Sequence (p,k) ->
-      let! _ = runPython p
+      let! _ = interpret p
       do! incrPC
       do! pause
-      return! runPython k
+      return! interpret k
     | End -> return None
     | ClassDef (n,ms) as cls ->
       let! pc = getPC
       let! s = getState
-      let! msVals = ms |> mapCo runPython
+      let! msVals = ms |> mapCo interpret
       let mutable m_pc = pc + 1
+      let fields = ms |> List.filter (function TypedDecl(_) -> true | _ -> false) 
+                      |> List.map (fun f -> match f with | TypedDecl(n,t,_) as d -> n,d | _ -> failwith "Malformed field declaration")
       let msValsByName = 
+        fields @
         [
           for m in msVals do
             match m with
             | Assign(f,ConstLambda(_,args,body)) -> 
               let pc = m_pc + 1
-              m_pc <- m_pc + 2 + body.NumberOfPythonLines
-              yield f,ConstLambda(pc,args,body)
-            | _ -> failwithf "Malformed method definition in class %s" n
+              m_pc <- m_pc + 1 + (body |> numberOfLines)
+              yield f,ConstLambda(pc,addThisToMethodArgs n args,body)
+            | _ -> 
+              m_pc <- m_pc + 1
         ] |> Map.ofList
-      do! setState { s with Heap = (s.Heap |> Map.add n (Hidden(Object(msValsByName |> Map.add "name" (ConstString n))))) }
-      let nl = cls.NumberOfPythonLines
-      do! changePC ((+) nl)
+      do! setState { s with Heap = (s.Heap |> Map.add n (Hidden(Object(msValsByName |> Map.add "__name" (ConstString n))))) }
+      let nl = cls |> numberOfLines
+      do! changePC ((+) (nl - 1))
       return None
     | StaticMethodCall(c,m,argExprs) ->
       let! s = getState
       match s.Heap.[c] with
       | Hidden(Object(ms)) 
       | Object(ms) ->
-        let! argVals = argExprs |> mapCo runPython
+        let! argVals = argExprs |> mapCo interpret
         let! s = getState
         match ms.[m] with
         | Hidden(ConstLambda(pc,argNames,body))
@@ -390,7 +397,7 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
           let c = Seq.zip argNames argVals |> Map.ofSeq |> Map.add "PC" (ConstInt pc) |> Map.add "ret" None
           do! setState { s with Stack = c :: s.Stack }
           do! pause
-          let! res = runPython body
+          let! res = interpret body
           match res with
           | None -> // automatically returned, pop stack frame here
             let! s = getState
@@ -413,9 +420,9 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
           | Ref(c_name) ->
             match s.Heap.[c_name] with
             | Hidden(Object(ms)) | Object(ms) ->
-              match ms.["name"] with
+              match ms.["__name"] with
               | ConstString v_type_name ->
-                return! runPython (StaticMethodCall(v_type_name, m, v_val :: argExprs))
+                return! interpret (StaticMethodCall(v_type_name, m, v_val :: argExprs))
               | _ -> return failwith ""
             | _ -> return failwith ""
           | _ -> return failwith ""
@@ -426,19 +433,28 @@ let rec runPython (p:Code) : Coroutine<RuntimeState,Code> =
       match s.Heap.[c] with
       | Hidden(Object(ms))
       | Object(ms) as o ->
-        let self = Object (Map.empty |> Map.add "__type" (Ref c))
+        let fields = ms |> Seq.filter (fun x -> match x.Value with | ConstLambda(_) | Hidden(ConstLambda(_)) -> false | _ -> x.Key.StartsWith("__") |> not) 
+                        |> Seq.map (fun x -> x.Key,Hidden(None)) |> Map.ofSeq
+        let self = Object (fields |> Map.add "__type" (Ref c))
         let self_ref_id = s.HeapSize.ToString()
         let self_ref = Ref self_ref_id
         do! setState { s with Stack = s.Stack; Heap = s.Heap |> Map.add self_ref_id self; HeapSize = s.HeapSize + 1 }
         do! pause
-        let! bodyRes = runPython (StaticMethodCall(c, "__init__", self_ref :: argExprs))
+        let! bodyRes = interpret (StaticMethodCall(c, consName c, self_ref :: argExprs))
         return self_ref
       | _ -> return failwithf "Cannot find class %s" c
+    | TypedDef(n,args,t,body) -> 
+      return! interpret (Def(n,args |> List.map snd, body))
+    | TypedDecl(v,t,Option.None) ->
+      return! interpret (Assign(v, Hidden(None)))
+    | TypedDecl(v,t,Some y) ->
+      return! interpret (Assign(v, y))
     | c -> return failwithf "Unsupported construct %A" c
-//    | TypedVar of string * string
-//    | TypedDef of string * List<string * string> * string * Code
   }
 
+
+let runPython p = interpret (fun _ args -> args) (fun _ -> "__init__") (fun c -> c.AsPython "") (fun c -> c.NumberOfPythonLines) p
+let runCSharp p = interpret (fun c args -> "this" :: args) id (fun c -> c.AsCSharp "") (fun c -> c.NumberOfCSharpLines) p
 
 let classDef c m = ClassDef(c,m)
 let (:=) x y = Assign(x,y)

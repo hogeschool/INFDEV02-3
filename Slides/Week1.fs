@@ -6,6 +6,18 @@ open CodeDefinition
 
 let slides = 
   [
+    CSharpStateTrace(TextSize.FootnoteSize,
+          ((classDef "Counter" 
+              [
+                typedDecl "cnt" "int"
+                typedDef "Counter" [] "" ("this.cnt" := constInt 0)
+                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+              ]) >>
+           (((typedDeclAndInit "c" "Counter" (newC "Counter" [ConstInt 5])) >>
+              (methodCall "c" "Incr" [ConstInt 5])) >> 
+               endProgram)),
+          { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = []; HeapSize = 1 })
+
     PythonStateTrace(TextSize.FootnoteSize,
           ((classDef "Counter" 
               [
