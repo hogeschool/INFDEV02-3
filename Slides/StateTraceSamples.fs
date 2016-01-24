@@ -6,7 +6,7 @@ open CodeDefinition
 
 let slides = 
   [
-    CSharpStateTrace(TextSize.FootnoteSize,
+    CSharpStateTrace(TextSize.Tiny,
           ((interfaceDef "ICounter" 
               [
                 typedSig "Incr" ["int","diff"] "void"
@@ -14,28 +14,28 @@ let slides =
            ((classDef "Counter" 
               [
                 implements "ICounter"
-                typedDecl "cnt" "int"
-                typedDef "Counter" [] "" ("this.cnt" := constInt 0)
-                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+                typedDecl "cnt" "int" |> makePrivate
+                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
+                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
               ]) >>
-            (((typedDeclAndInit "c" "ICounter" (newC "Counter" [ConstInt 5])) >>
+            (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
                (methodCall "c" "Incr" [ConstInt 5])) >> 
                 endProgram))),
           { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = []; HeapSize = 1 })
 
-    CSharpStateTrace(TextSize.FootnoteSize,
+    CSharpStateTrace(TextSize.Tiny,
           ((classDef "Counter" 
               [
-                typedDecl "cnt" "int"
-                typedDef "Counter" [] "" ("this.cnt" := constInt 0)
-                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+                typedDecl "cnt" "int" |> makePrivate
+                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
+                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
               ]) >>
-           (((typedDeclAndInit "c" "Counter" (newC "Counter" [ConstInt 5])) >>
+           (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
               (methodCall "c" "Incr" [ConstInt 5])) >> 
                endProgram)),
           { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = []; HeapSize = 1 })
 
-    PythonStateTrace(TextSize.FootnoteSize,
+    PythonStateTrace(TextSize.Tiny,
           ((classDef "Counter" 
               [
                 def "__init__" ["self"] ("self.cnt" := constInt 0)
@@ -46,18 +46,8 @@ let slides =
               endProgram)),
           { Stack = [["PC", constInt 1] |> Map.ofList]; Heap = Map.empty; InputStream = []; HeapSize = 1 })
 
-    CSharpCodeBlock(TextSize.FootnoteSize,
-        (classDef "Counter" 
-          [
-            typedDecl "cnt" "int"
-            typedDef "Counter" [] "" ("cnt" := constInt 0)
-            typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
-          ]) >>
-        (((typedDeclAndInit "c" "Counter" (newC "Counter" [ConstInt 5])) >>
-          (methodCall "c" "incr" []))))
 
-
-    PythonStateTrace(TextSize.Small,
+    PythonStateTrace(TextSize.Tiny,
       (def "f" ["x"] 
         (ifelse (var "x" .> constInt 0) 
           (ret ((call "f" [constInt -20]) .+ constInt 1))

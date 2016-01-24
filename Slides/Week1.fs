@@ -587,28 +587,29 @@ let slides =
               def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
             ]) >>
           ((("c" := newC "Counter" []) >>
-            (methodCall "c" "incr" []))))
+            (methodCall "c" "incr" [ConstInt 5]))))
 
       TextBlock @"The above Python becomes, in both JC\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           (classDef "Counter" 
             [
-              typedDecl "cnt" "int"
-              typedDef "Counter" [] "" ("cnt" := constInt 0)
-              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" ("cnt" := constInt 0) |> makePublic
+              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
             ]) >>
           (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
-            (methodCall "c" "incr" []))))
+            (methodCall "c" "incr" [ConstInt 5]))))
     ]
 
 //Statically typed, object-oriented programming languages
 //Arrays as primitive data types
+//Access modifiers: private and public
 //Static methods
 //calling static methods
 //main
 //\textbf{Advanced} lambda's
-//Add Java examples as well, with keywords for specific translation later instead of strings for the methods
+//Add Java examples as well, with keywords for specific translation later instead of strings for the methods (such as read, parse, and print)
 //The Java examples appear after C# in a new slide, right beneath the C# example
 //
 //\SlideSection{Conclusion}

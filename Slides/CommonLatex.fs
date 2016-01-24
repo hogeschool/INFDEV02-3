@@ -19,11 +19,12 @@ let beginTabular c =
   | _ -> @"\begin{tabular}{ |" + (c |> List.reduce (fun a b -> a + "|" + b))  + "| }\n\\hline"
 let endTabular = @"\end{tabular}"
 
-type TextSize = FootnoteSize | Tiny | Small | Normal | Large
+type TextSize = ScriptSize | FootnoteSize | Tiny | Small | Normal | Large
   with 
     override this.ToString() =
       match this with
       | FootnoteSize -> @"\footnotesize"
+      | ScriptSize -> @"\scriptsize"
       | Tiny -> @"\tiny"
       | Small -> @"\small"
       | Normal -> @"\normal"

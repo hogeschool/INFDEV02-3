@@ -18,6 +18,8 @@ type Operator = Plus | Minus | Times | DividedBy | GreaterThan
 let (!+) = List.fold (+) ""
 
 type Code =
+  | Public of Code
+  | Private of Code
   | End
   | None
   | Ref of string
@@ -104,11 +106,15 @@ type Code =
 
     member this.AsCSharp pre = 
       match this with
+      | Private p ->
+        (sprintf "%sprivate%s" pre (p.AsCSharp pre)).Replace("private" + pre, "private ")
+      | Public p ->
+        (sprintf "%spublic%s" pre (p.AsCSharp pre)).Replace("public" + pre, "public ")
       | Object bs ->
         let argss = bs |> Map.remove "__type" |> Seq.map (fun a -> a.Key + "=" + (a.Value.AsCSharp "") + ", ") |> Seq.toList
         sprintf "%s%s" pre ((!+argss).TrimEnd[|','; ' '|])
       | End -> ""
-      | None -> "void"
+      | None -> "null"
       | Implementation i -> 
         ""
       | InterfaceDef(s,ms) ->
@@ -217,13 +223,10 @@ type RuntimeState = { Stack : List<Map<string, Code>>; HeapSize : int; Heap : Ma
       let stackTable = sprintf "%s\n%s\n%s\n" (beginTabular hd) stackTableContent endTabular
 
       let heap = 
-        if this.Heap |> Map.isEmpty then
-          ""
-        else
-          let heapNames,heapValues = printBindings toString this.Heap
-          let hd = heapNames |> Seq.map (fun _ -> "c") |> Seq.toList
-          let heapTableContent = sprintf "%s \\\\\n\\hline\n%s \\\\\n\\hline\n" heapNames heapValues
-          sprintf "%s\n%s\n%s" (beginTabular hd) heapTableContent endTabular
+        let heapNames,heapValues = printBindings toString this.Heap
+        let hd = heapNames |> Seq.map (fun _ -> "c") |> Seq.toList
+        let heapTableContent = sprintf "%s \\\\\n\\hline\n%s \\\\\n\\hline\n" heapNames heapValues
+        sprintf "%s\n%s\n%s" (beginTabular hd) heapTableContent endTabular
       stackTable, heap
 
 
@@ -315,7 +318,7 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
     match p with
     | None -> 
       return None
-    | Hidden c -> 
+    | Hidden c | Private c | Public c -> 
       return! interpret c
     | Ref _ as r ->
       return r
@@ -386,7 +389,11 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
     | Sequence (p,k) ->
       let! _ = interpret p
       do! incrPC
-      do! pause
+      do! match p with
+          | Def(_) | ClassDef(_) | InterfaceDef(_) -> 
+            ret ()
+          | _ ->
+            pause
       return! interpret k
     | End -> return None
     | Implementation i -> return None
@@ -414,8 +421,10 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
       let! s = getState
       let! msVals = ms |> List.filter (function Implementation _ -> false | _ -> true) |> mapCo interpret
       let mutable m_pc = pc + 1
-      let fields = ms |> List.filter (function TypedDecl(_) -> true | _ -> false) 
-                      |> List.map (fun f -> match f with | TypedDecl(n,t,_) as d -> n,d | _ -> failwith "Malformed field declaration")
+      let fields = ms |> List.filter (function TypedDecl(_) | Private(TypedDecl(_)) | Public(TypedDecl(_)) -> true | _ -> false) 
+                      |> List.map (fun f -> match f with 
+                                            | TypedDecl(n,t,_) | Public(TypedDecl(n,t,_)) | Private(TypedDecl(n,t,_)) as d -> n,d 
+                                            | _ -> failwith "Malformed field declaration")
       let msValsByName = 
         fields @
         [
@@ -504,6 +513,8 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
 let runPython p = interpret (fun _ args -> args) (fun _ -> "__init__") (fun c -> c.AsPython "") (fun c -> c.NumberOfPythonLines) p
 let runCSharp p = interpret (fun c args -> "this" :: args) id (fun c -> c.AsCSharp "") (fun c -> c.NumberOfCSharpLines) p
 
+let makePublic c = Public(c)
+let makePrivate c = Private(c)
 let implements i = Implementation(i)
 let interfaceDef c m = InterfaceDef(c,m)
 let classDef c m = ClassDef(c,m)
