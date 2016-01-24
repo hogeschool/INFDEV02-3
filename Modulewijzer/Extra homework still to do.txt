@@ -1,0 +1,6 @@
+4) Make a "Person" interface with methods (or properties with only a getter):
+- Name
+- Surname
+- Age
+
+5) Make the "Customer", "Student", "Teacher" implementations of "Person", ensuring that they all get at least three additional methods and attributes over those in (4)

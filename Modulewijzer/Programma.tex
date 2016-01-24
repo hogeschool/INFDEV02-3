@@ -1,7 +1,7 @@
 \section{Course program}
 	The course is structured into six lectures. The six lectures take place during the six weeks of the course, but are not necessarily in a one-to-one correspondance with the course weeks. For example, lectures one and two are fairly short and can take place during a single week.
 
-		\subsection{Week 1 - statically typed programming languages}
+		\subsection{Chapter 1 - statically typed programming languages}
 		\paragraph*{Topics}
 		\begin{itemize}
 			\item What are types?
@@ -17,7 +17,7 @@
 			\end{itemize}
 		\end{itemize}
 		
-		\paragraph*{Homework}
+		\paragraph*{Homework}\footnote{The solution to all homework is published on Natschool or GitHub}
 		\begin{itemize}
 			\item Write an example of Python code that would cause a type error in Java/C\#
 			\item Given the following semantic and typing rules, write down how we read them; make an example code that uses them
@@ -35,7 +35,7 @@
 		
 		
 		
-		\subsection{Week 2 - reuse through polymorphism}
+		\subsection{Chapter 2 - reuse through polymorphism}
 		
 		\paragraph*{Topics}			
 		\begin{itemize}
@@ -55,7 +55,7 @@
 			\item Make a program that receives three vehicles, without knowing their concrete type, and moves them (without resorting to conversions) until their fuel is up
 		\end{itemize}
 		
-		\subsection{Week 3 - reuse through generics}
+		\subsection{Chapter 3 - reuse through generics}
 		\paragraph*{Topics}			
 		\begin{itemize}
 			\item (\textbf{Advanced}) Generic parameters
@@ -72,13 +72,13 @@
 		
 		
 		
-		\subsection{Week 4 - architectural considerations}
+		\subsection{Chapter 4 - architectural considerations}
 		
 		\paragraph*{Topics}			
 		\begin{itemize}
 			\item Encapsulation
 			\item Abstract classes: between interfaces and implementation
-			\item Inheritance
+			\item Inheritance of classes and abstract classes
 		\end{itemize}
 		
 		\paragraph*{Homework}
@@ -89,7 +89,7 @@
 			\item (\textbf{Advanced}) Rebuild timers, but this time with lambda's instead of our custom \texttt{Event}.
 		\end{itemize}
 		
-		\subsection{Week 5 - yet more architectural considerations}
+		\subsection{Chapter 5 - yet more architectural considerations}
 		\paragraph*{Topics}			
 		\begin{itemize}
 			\item (\textbf{Advanced}) Composition versus inheritance
@@ -103,16 +103,46 @@
 			\item (\textbf{Advanced}) Write a \texttt{Car} class that inherits from \texttt{Entity} and which implements all the functionality that you would expect from a car, but with the \textit{Entity-Component} model; you will need to build components for the engine, the wheels, etc. and all that the \texttt{Car} class does is make correct use of these components.
 		\end{itemize}
 		
-		\paragraph*{Homework}
-		\subsection{Week 6 - standard libraries}
-		\paragraph*{Topics}			
-		\begin{itemize}
-			\item Collection libraries of JVM and .Net
-			\item GUI libraries
-			\item Web GUI libraries
-		\end{itemize}
 		
-		\begin{itemize}
-			\item Make a form application that shows a scrolling panel containing elements from the classes built in the previous homework: lightswitches, cars, timers, etc.;
-			\item Make the application web-based with ASP.Net or JSF.
-		\end{itemize}
+\section{Extra homework}\footnote{The solution to all homework is published on Natschool or GitHub}
+In order to exercise on your own, you can try your hand at a series of extra, smaller assignments.
+
+\begin{enumerate}
+	\item Make a for-loop that sums all numbers between two inputs read from the console
+
+	\item Make a (static) function for (1)
+
+	\item Make an \texttt{Interval} class that:
+	\begin{itemize}
+		\item takes two integers, \texttt{l} and \texttt{u}, as its constructor parameters
+		\item has a \texttt{Sum} method that returns the sum of all numbers between \texttt{l} and \texttt{u}
+		\item has a \texttt{Product} method that returns the product of all numbers between \texttt{l} and \texttt{u}
+	\end{itemize}
+
+	\item Make a \texttt{Person} interface with methods (or properties with only a getter):
+	\begin{itemize}
+		\item Name
+		\item Surname
+		\item Age
+	\end{itemize}
+
+	\item Make the \texttt{Customer}, \texttt{Student}, \texttt{Teacher} implementations of \texttt{Person}, ensuring that they all get at least three additional methods and attributes over those in (4)
+
+	\item Make a generic \texttt{Number<N>} abstract class, with methods:
+	\begin{itemize}
+		\item \texttt{Zero} that returns an \texttt{N}
+		\item \texttt{One} that returns an \texttt{N}
+		\item abstract methods \texttt{Negate}, that takes an \texttt{N} and returns an \texttt{N} (for example \texttt{Negate(1)} return \texttt{-1})
+- Plus, Times, DividedBy that all take two N's and returns an N
+		\item The non-abstract method \texttt{Minus} that makes use of \texttt{Plus} and \texttt{Negate}
+		\item abstract methods \texttt{SmallerThan} and \texttt{Equal}, that take two \texttt{N}'s and return a \texttt{boolean}
+		\item The non-abstract methods \texttt{SmallerOrEqual}, \texttt{GreaterThan}, \texttt{GreaterOrEqual}, \texttt{NotEqual}
+	\end{itemize}
+	
+	\item Make a class \texttt{IntNumber} that implements \texttt{Number<int>}
+	\item Make a class \texttt{FloatNumber} that implements \texttt{Number<float>}
+	\item Try to make a class \texttt{StringNumber} that implements \texttt{Number<string}: how far can you come?
+	
+	\item Make the class of (3) generic with respect to the type of the parameters \texttt{l} and \texttt{u}; specifically, build a generic class \texttt{Interval<N>} which takes as input two \texttt{N}'s \texttt{l} and \texttt{u}, and also an instance of \texttt{Number<N>}
+	
+\end{enumerate}
