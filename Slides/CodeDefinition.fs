@@ -18,8 +18,10 @@ type Operator = Plus | Minus | Times | DividedBy | GreaterThan
 let (!+) = List.fold (+) ""
 
 type Code =
+  | Static of Code
   | Public of Code
   | Private of Code
+  | Dots
   | End
   | None
   | Ref of string
@@ -62,6 +64,7 @@ type Code =
       | Return c ->
         sprintf "%sreturn %s\n" pre ((c.AsPython "").Replace("\n",""))
       | Var s -> s
+      | Dots -> "...\n"
       | ConstBool b -> b.ToString()
       | ConstInt i -> i.ToString()
       | ConstFloat f -> f.ToString()
@@ -108,6 +111,8 @@ type Code =
       match this with
       | Private p ->
         (sprintf "%sprivate%s" pre (p.AsCSharp pre)).Replace("private" + pre, "private ")
+      | Static p ->
+        (sprintf "%sstatic%s" pre (p.AsCSharp pre)).Replace("static" + pre, "static ")
       | Public p ->
         (sprintf "%spublic%s" pre (p.AsCSharp pre)).Replace("public" + pre, "public ")
       | Object bs ->
@@ -115,6 +120,7 @@ type Code =
         sprintf "%s%s" pre ((!+argss).TrimEnd[|','; ' '|])
       | End -> ""
       | None -> "null"
+      | Dots -> "...\n"
       | Implementation i -> 
         ""
       | InterfaceDef(s,ms) ->
@@ -513,6 +519,7 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
 let runPython p = interpret (fun _ args -> args) (fun _ -> "__init__") (fun c -> c.AsPython "") (fun c -> c.NumberOfPythonLines) p
 let runCSharp p = interpret (fun c args -> "this" :: args) id (fun c -> c.AsCSharp "") (fun c -> c.NumberOfCSharpLines) p
 
+let makeStatic c = Static(c)
 let makePublic c = Public(c)
 let makePrivate c = Private(c)
 let implements i = Implementation(i)
@@ -523,6 +530,7 @@ let newC c a = New(c,a)
 let constInt x = ConstInt(x)
 let constFloat x = ConstFloat(x)
 let constString x = ConstString(x)
+let dots = Dots
 let typedDecl x t = TypedDecl(x,t,Option.None)
 let typedDeclAndInit x t c = TypedDecl(x,t,Some c)
 let var x = Var(x)
@@ -531,6 +539,7 @@ let def x l b = Def(x,l,b)
 let typedDef x l t b = TypedDef(x,l,t,b)
 let typedSig x l t = TypedSig(x,l,t)
 let call x l = Call(x,l)
+let staticMethodCall c m l = StaticMethodCall(c,m,l)
 let methodCall x m l = MethodCall(x,m,l)
 let ifelse c t e = If(c,t,e)
 let whiledo c b = While(c,b)

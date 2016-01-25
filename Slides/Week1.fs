@@ -79,255 +79,7 @@ let slides =
         ! "Customizable abstractions: functions, recursive functions, classes, methods"
       ]
 
-    SubSection "Issues with Python"
-    ItemsBlock
-      [
-        ! "Lack of constraints: how can we specify that a function only takes integers as input"
-        ! "Lack of structure: how can we specify that a variable will certainly support some methods"
-        ! "Lack of assurances: how can we guarantee that programs with evident errors are not run"
-      ]
-
-    SubSection "Broken code examples"
-    VerticalStack[
-      Question "What is wrong with this?"
-      PythonCodeBlock(TextSize.Normal,
-          def "f" ["x"] (ret (var "x" .* constInt 2)) >>
-          call "f" [constString "nonsense"])
-      Pause
-      TextBlock "The function clearly works with integers, but is given a string"
-      ]
-
-    VerticalStack[
-      Question "What is wrong with this?"
-      PythonCodeBlock(TextSize.Normal,
-         ("x" := (call "input" []) >>
-          ifelse (var "x" .> constInt 100) 
-                 (call "print" [constString "dumb"])
-                 (call "print" [constString "dumber"])))
-      Pause
-      TextBlock @"The comparison is nonsensical if \texttt{x} is not a number"
-      ]
-
-    VerticalStack[
-      Question "What is wrong with this?"
-      PythonCodeBlock(TextSize.Normal,
-         (def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
-          call "g" [constInt -1]))
-      Pause
-      TextBlock @"We expect something with a \texttt{drive} method, but get an integer instead"
-      ]
-
-    SubSection "Possible solutions"
-    ItemsBlock
-      [
-        ! "Testing the program should be enough"
-        Pause
-        ! "Right?"
-        Pause
-        ! "No. The number of possible execution paths is immense (order of billions), and each test only takes one."
-        ! "Testing can only guarantee presence of bugs, but not their absence!"
-      ]
-
-    VerticalStack[
-      Question @"How many times would we need to test to be sure there is no error?"
-      PythonCodeBlock(TextSize.Normal,
-         (ifelse (call "randint" [constInt 0; constInt 100000] .> constInt 99999)
-                 (call "g" [constInt -1])
-                 (call "g" [var "mercedesSL500"])))
-      Pause
-      TextBlock ">100000"
-      ]
-
-    ItemsBlock
-      [
-        ! "We want our programming languages to perform checks for us"
-        ! "Clearly nonsensical programs should be rejected before we can even run them"
-        ! @"It is safer and easier to spend more time ""talking"" with the IDE than hoping to find all errors at runtime"
-      ]
-
-    Section "Static typing"
-    SubSection "Introduction"
-    ItemsBlock
-      [
-        ! @"The language verifies\footnote{By means of the \textbf{compiler}.}, before running code, that all variables are correctly used"
-        ! @"""Correctly used"" means that they are guaranteed to support all operations used on them"
-        ! "This is by far and large the most typical solution to increase safety and productivity"
-      ]
-
-    SubSection "What is static typing?"
-    ItemsBlock
-      [
-        ! "When declaring a variable, we also specify what sort of data it will contain"
-        ! @"The \textbf{sort} of data contained is called \textbf{TYPE} of the variable"
-        ! "Types can be either primitives (int, string, etc.), custom (classes), or compositions (functions, list of elements of a given type, etc.)"
-      ]
-
-    ItemsBlock
-      [
-        ! "Especially in mainstream languages, the specification of the type of a variable is done by hand by the programmer"
-        ! "In other languages (mostly functional languages like F\#, Haskell, etc.) the type of variables is automatically guessed by the compiler"
-        ! "In our case our programs will become a bit more verbose but better specified"
-        ! "Still, static typing is not necessarily connected with verbosity"
-      ]
-
-    VerticalStack[
-      PythonCodeBlock(TextSize.Normal,
-          (def "f" ["x"] (ret (var "x" .* constInt 2))))
-      TextBlock "Becomes, typed:"
-      CSharpCodeBlock(TextSize.Normal,
-          (typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2))))
-      Question @"What has improved and why?"
-      Pause
-      TextBlock "The second definition encodes information about what goes in and what comes out of the function"
-      ]
-
-    VerticalStack[
-      Question @"Is this possible now?"
-      CSharpCodeBlock(TextSize.Normal,
-         (typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2)) >>
-          call "f" [constString "nonsense"]))
-      Pause
-      TextBlock "No: we get a compiler error because a string cannot be used where a number is expected"
-      ]
-
-    VerticalStack[
-      PythonCodeBlock(TextSize.Normal,
-         ("x" := (call "input" []) >>
-          ifelse (var "x" .> constInt 100) 
-                 (call "print" [constString "dumb"])
-                 (call "print" [constString "dumber"])))
-      TextBlock "Becomes, typed:"
-      CSharpCodeBlock(TextSize.Normal,
-         (typedDecl "x" "int" >>
-          (("x" := (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
-           ifelse (var "x" .> constInt 100) 
-                  (call "Console.WriteLine" [constString "safe"])
-                  (call "Console.WriteLine" [constString "safer"]))))
-      Question @"What has improved and why?"
-      Pause
-      TextBlock "The variable declaration specifies what is allowed (and what is not) inside the variable."
-      ]
-
-    VerticalStack[
-      PythonCodeBlock(TextSize.Normal,
-         (def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
-          call "g" [constInt -1]))
-      TextBlock "Becomes, typed:"
-      CSharpCodeBlock(TextSize.Normal,
-         (typedDef "g" ["Car","car"] "void" (ret (methodCall "car" "drive" [constInt 2])) >>
-          call "g" [constInt -1]))
-      Question @"What has improved and why?"
-      Pause
-      TextBlock "The function declaration specifies available methods of \texttt{car}. We will thus get a compiler error."
-      ]
-
-    SubSection "Typing rules and semantic rules"
-    ItemsBlock[
-      !"How do we describe such relations clearly?"
-      ! @"We use the so-called \textbf{typing rules}, which specify what may be done and what not"
-      ! "Typing rules are quite intuitive: they state that if one or more premises are true, then the conclusion is true as well"
-    ]
-
-    SubSection "Reading typing rules"
-    Advanced(
-      VerticalStack[
-        TypingRules[
-          {
-            Premises = ["A"; "B"]
-            Conclusion = "C"
-          }
-        ]
-        TextBlock @"If A and B are true, then we can conclude C" 
-        ])
-
-    Advanced(
-      VerticalStack[
-        TypingRules[
-          {
-            Premises = [@"\text{I wish to buy a pretty car}"; @"\text{I have 120000 euros}"]
-            Conclusion = @"\text{I buy a Mercedes SL500}"
-          }
-        ]
-        Question "How do we read this rule?"
-        Pause
-        TextBlock @"If I have 120000 euros and I wish to buy a pretty car, then I buy a Mercedes SL500" 
-        ])
-
-    Advanced(
-      VerticalStack[
-        TypingRules[
-          {
-            Premises = [@"\text{I have my umbrella with me}"; @"\text{It is raining}"]
-            Conclusion = @"\text{I open my umbrella}"
-          }
-        ]
-        Question "How do we read this rule?"
-        Pause
-        TextBlock @"If I have my umbrella with me, and it is raining, then I open my umbrella" 
-        ])
-
-    ItemsBlock[
-      ! @"Let us apply this concept to programming languages"
-      ! @"We do this independently from the specific programming language"
-      ! "We focus on conditionals"
-    ]
-
-    ItemsBlock[
-      !! "if c then a else b"
-      ! "When does this make sense?"
-      Pause
-      ! "c needs to be a boolean expression"
-      ! "a is a code block (evaluates to None)"
-      ! "b is a code block (evaluates to None)"
-    ]
-
-    Advanced(
-      VerticalStack[
-        ItemsBlock[
-          ! "We want to specify this in the typing rule notation"
-          ! @"Assume that "":"" means ""has type"", as in:"
-          !! "x : int"
-          ! @"Assume that \texttt{void} is the type without values"
-        ]
-        TypingRules[
-          {
-            Premises = [@"\mathtt{c : Boolean}"; @"\mathtt{a : void}"; @"\mathtt{b : void}"]
-            Conclusion = @"\mathtt{if\ c\ then\ a\ else\ b\ :\ void}"
-          }
-        ]
-        TextBlock "If a part of a program does not have a type derived through the typing rules (also void is fine), then the whole program cannot be run and we get a compiler error"
-        ])
-
-    TextBlock @"We can use typing rules\footnote{In this case we simply call them \textbf{inference rules}} in a broader scope: also for specifying the semantics of constructs"
-
-    ItemsBlock[
-      !! "if c then a else b"
-      ! "What does this do?"
-      Pause
-      ! "if c evaluates to True, then we evaluate a"
-      ! "if c evaluates to False, then we evaluate b"
-    ]
-
-    Advanced(
-      VerticalStack[
-        ItemsBlock[
-          ! "We want to specify this in the inference rule notation"
-          ! @"Assume that $\rightarrow$ means ""evaluates to"", as in:"
-          ! @"$3+1 \rightarrow 4$"
-        ]
-        Tiny
-        TypingRules[
-          {
-            Premises = [@"\langle c,S,H \rangle \rightarrow \langle True,S',H' \rangle"; @"\langle a,S',H' \rangle \rightarrow \langle res,S'',H'' \rangle"]
-            Conclusion = @"\langle \mathtt{if\ c\ then\ a\ else\ b},S,H \rangle \rightarrow \langle res,S'',H'' \rangle"
-          }
-          {
-            Premises = [@"\langle c,S,H \rangle \rightarrow \langle False,S',H' \rangle"; @"\langle b,S',H' \rangle \rightarrow \langle res,S'',H'' \rangle"]
-            Conclusion = @"\langle \mathtt{if\ c\ then\ a\ else\ b},S,H \rangle \rightarrow \langle res,S'',H'' \rangle"
-          }
-        ]])
-
-    Section "Statically typed, object-oriented, modern programming languages"
+    Section "Modern, object-oriented programming languages"
     SubSection "Introduction and motivation"
     ItemsBlock
       [
@@ -390,6 +142,8 @@ let slides =
         ! @"This will not be true anymore in Java/C\#"
         ! @"Separate snippets of code cannot be just pasted in an empty file and tried out"
       ]
+
+    TextBlock @"All snippets of Java and C\# that we will see now cannot (until we see the \texttt{Main}) just be pasted in an empty file and run like we did for Python!!!"
 
     VerticalStack[
       Small
@@ -474,7 +228,7 @@ let slides =
       TextBlock @"The above Python becomes, in both JC\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
-        (call "print" [call "Int32.Parse" [(call "Console.ReadLine" [])]]))
+        (call "Console.WriteLine" [call "Int32.Parse" [(call "Console.ReadLine" [])]]))
     ]
 
     ItemsBlock
@@ -538,8 +292,16 @@ let slides =
       ]
 
     VerticalStack[
-      TextBlock @"A class in JC\# looks very much like a Python class, where init is a method with the name of the class itself and fields must be declared, like variables, within the body of the class."
+      TextBlock @"A class in JC\# looks very much like a Python class, with some minor differences:"
+      ItemsBlock
+        [
+          ! @"\texttt{\_\_init\_\_} is a method with the name of the class itself"
+          ! @"all fields must be declared, like variables, within the body of the class"
+          ! @"\texttt{self} is now called \texttt{this}"
+        ]
+      ]
 
+    VerticalStack[
       PythonCodeBlock(TextSize.Tiny,
           classDef "Counter" 
             [
@@ -551,9 +313,58 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           classDef "Counter" 
             [
-              typedDecl "cnt" "int"
-              typedDef "Counter" [] "" ("cnt" := constInt 0)
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
             ])
+    ]
+
+    ItemsBlock 
+      [ 
+        ! @"We can limit visibility of attributes (and methods) in a class in JC\#;" 
+        ! @"This means we can prevent a user of a class from accidentally using something in the wrong way" 
+        ! @"Most important attributes are" 
+        Items
+          [ 
+            ! @"\texttt{public}, means every part of the program can access it" 
+            ! @"\texttt{private}, means it can only be accessed from inside the class" 
+          ]
+        ! @"We assume for the moment that the constructor will always be \texttt{public}" 
+      ]
+
+    VerticalStack[
+      TextBlock @"Assuming \texttt{x} being an instance of \texttt{C}, this would be an invalid program:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          ((classDef "C" 
+              [
+                typedDecl "a" "int" |> makePrivate
+                typedDecl "b" "int" |> makePublic
+                typedDef "C" [] "" (("a" := constInt 0) >> ("b" := constInt 0)) |> makePublic
+              ])) >>
+            (dots >>
+             call "Console.WriteLine" [var "x.a"]))
+
+      Question @"In what sense \textit{invalid}?"
+
+      Pause
+
+      TextBlock @"The \textbf{compiler} will literally refuse to run the program by saying that \texttt{a} is private, and thus may not be accessed."
+    ]
+
+    VerticalStack[
+      TextBlock @"Assuming \texttt{x} being an instance of \texttt{C}, this would be a valid program, just like in Python:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          ((classDef "C" 
+              [
+                typedDecl "a" "int" |> makePrivate
+                typedDecl "b" "int" |> makePublic
+                typedDef "C" [] "" (("a" := constInt 0) >> ("b" := constInt 0)) |> makePublic
+              ])) >>
+            (dots >>
+             call "Console.WriteLine" [var "x.b"]))
+
+      TextBlock @"This suggests that Python is like Java/C\# where all class attributes are automatically declared as \texttt{public}."
     ]
 
     VerticalStack[
@@ -571,11 +382,18 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           classDef "Counter" 
             [
-              typedDecl "cnt" "int"
-              typedDef "Counter" [] "" ("cnt" := constInt 0)
-              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff"))
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" ("cnt" := constInt 0) |> makePublic
+              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
             ])
     ]
+
+    ItemsBlock
+      [
+        ! @"Methods can, just like attributes, either \texttt{private} or \texttt{public}"
+        ! @"\texttt{public} methods can be called from anywhere"
+        ! @"\texttt{private} methods may only be called from inside the class itself"      
+      ]
 
     VerticalStack[
       TextBlock @"Now that we have a class, we can instantiate it and call its methods."
@@ -602,15 +420,100 @@ let slides =
             (methodCall "c" "incr" [ConstInt 5]))))
     ]
 
-//Statically typed, object-oriented programming languages
+    VerticalStack[
+      TextBlock @"Method access determines where they can be called. Suppose \texttt{x} is of type \texttt{C}:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          ((classDef "C" 
+              [
+                typedDecl "a" "int" |> makePrivate
+                typedDecl "b" "int" |> makePublic
+                typedDef "C" [] "" (("this.a" := constInt 0) >> ("this.b" := constInt 0)) |> makePublic
+                typedDef "IncrA" ["int","diff"] "void" ("this.a" := (var "this.a" .+ var "diff")) |> makePublic
+                typedDef "IncrB" ["int","diff"] "void" ("this.b" := (var "this.b" .+ var "diff")) |> makePrivate
+              ])) >>
+            (dots >>
+             methodCall "x" "IncrA" [ConstInt 10]))
+
+      Question @"Will this program be allowed to run?"
+      Pause
+      TextBlock @"Yes, because \texttt{IncrA} is a public method."
+    ]
+
+    VerticalStack[
+      TextBlock @"Method access determines where they can be called. Suppose \texttt{x} is of type \texttt{C}:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          ((classDef "C" 
+              [
+                typedDecl "a" "int" |> makePrivate
+                typedDecl "b" "int" |> makePublic
+                typedDef "C" [] "" (("this.a" := constInt 0) >> ("this.b" := constInt 0)) |> makePublic
+                typedDef "IncrA" ["int","diff"] "void" ("this.a" := (var "this.a" .+ var "diff")) |> makePublic
+                typedDef "IncrB" ["int","diff"] "void" ("this.b" := (var "this.b" .+ var "diff")) |> makePrivate
+              ])) >>
+            (dots >>
+             methodCall "x" "IncrB" [ConstInt 10]))
+
+      Question @"Will this program be allowed to run?"
+      Pause
+      TextBlock @"No, because \texttt{IncrB} is a private method."
+    ]
+
+    TextBlock @"Surprisingly, both Java and C\# miss simple functions like those of Python: this means that they need to be emulated as methods."
+
+    VerticalStack[
+      TextBlock @"Simple Python functions become \textit{static methods} in both Java and C\#."
+
+      PythonCodeBlock(TextSize.Tiny,
+          def "f" ["x"]
+            (ret (var "x" .+ ConstInt(10))))
+
+      TextBlock @"The above Python needs to be put inside a class and be marked as \texttt{static}, in both Java and C\#:"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          classDef "MyClass" 
+            [
+              typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
+            ])
+    ]
+
+    VerticalStack[
+      TextBlock @"\textit{static methods} are called without an instance of the class left of the dot, but rather with the name of the class they are declared in"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          ((classDef "MyClass" 
+              [
+                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
+              ])) >>
+           (dots >>
+            staticMethodCall "MyClass" "f" [ConstInt(10)]))
+    ]
+
+    ItemsBlock 
+      [
+        ! @"Java and C\# programs do not just begin at the top of a file."
+        ! @"The program is a class with a special static method, called \texttt{main}."
+        ! @"The arguments to this method are an array of strings, the command line parameters\footnote{Just ignore, it is mostly not used.}."
+      ]
+
+    VerticalStack[
+      TextBlock @"Here is our first actual Java/C\# program of the day!"
+
+      CSharpCodeBlock(TextSize.Tiny,
+          ((classDef "Program" 
+              [
+                typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
+              ])))
+    ]
+
+
 //Arrays as primitive data types
-//Access modifiers: private and public
-//Static methods
-//calling static methods
-//main
 //\textbf{Advanced} lambda's
+//Multiple classes and files in Java
 //Add Java examples as well, with keywords for specific translation later instead of strings for the methods (such as read, parse, and print)
 //The Java examples appear after C# in a new slide, right beneath the C# example
+//Each C# example (but not the duplicated Java version) has its own stack and heap
 //
 //\SlideSection{Conclusion}
 //\SlideSubSection{Lecture topics}
