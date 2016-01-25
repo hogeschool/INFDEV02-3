@@ -1,5 +1,5 @@
 ﻿module SlideDefinition
-open CodeDefinition
+open CodeDefinitionImperative
 open Coroutine
 open CommonLatex
 open Runtime

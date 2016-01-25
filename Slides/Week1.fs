@@ -2,7 +2,7 @@
 
 open CommonLatex
 open SlideDefinition
-open CodeDefinition
+open CodeDefinitionImperative
 open Interpreter
 
 let slides = 

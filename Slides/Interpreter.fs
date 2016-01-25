@@ -1,6 +1,6 @@
 ﻿module Interpreter
 
-open CodeDefinition
+open CodeDefinitionImperative
 open Coroutine
 open Runtime
 

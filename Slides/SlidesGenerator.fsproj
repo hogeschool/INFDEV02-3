@@ -51,7 +51,8 @@
     <Compile Include="Coroutine.fs" />
     <Compile Include="CommonLatex.fs" />
     <Compile Include="Runtime.fs" />
-    <Compile Include="CodeDefinition.fs" />
+    <Compile Include="CodeDefinitionFunctional.fs" />
+    <Compile Include="CodeDefinitionImperative.fs" />
     <Compile Include="Interpreter.fs" />
     <Compile Include="SlideDefinition.fs" />
     <Compile Include="StateTraceSamples.fs" />
