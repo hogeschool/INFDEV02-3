@@ -3,6 +3,7 @@
 open CommonLatex
 open SlideDefinition
 open CodeDefinition
+open Interpreter
 
 let slides = 
   [

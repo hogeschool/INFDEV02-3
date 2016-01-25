@@ -2,6 +2,8 @@
 open CodeDefinition
 open Coroutine
 open CommonLatex
+open Runtime
+open Interpreter
 
 type SlideElement = 
   | Section of string 
@@ -21,8 +23,8 @@ type SlideElement =
   | Large
   | TypingRules of List<TypingRule>
   | VerticalStack of List<SlideElement>
-  | PythonStateTrace of TextSize * Code * RuntimeState
-  | CSharpStateTrace of TextSize * Code * RuntimeState
+  | PythonStateTrace of TextSize * Code * RuntimeState<Code>
+  | CSharpStateTrace of TextSize * Code * RuntimeState<Code>
   with
     member this.ToStringAsElement() = 
       match this with
@@ -90,7 +92,7 @@ type SlideElement =
         let ps = (p.AsPython "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
-            let stack,heap = st.AsSlideContent (fun c -> c.AsPython)
+            let stack,heap = st.AsSlideContent (function Hidden _ -> true | _ -> false) (fun c -> c.AsPython)
             let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\Heap: %s\\%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
@@ -100,7 +102,7 @@ type SlideElement =
         let ps = (p.AsCSharp "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
-            let stack,heap = st.AsSlideContent (fun c -> c.AsCSharp)
+            let stack,heap = st.AsSlideContent (function Hidden _ -> true | _ -> false) (fun c -> c.AsCSharp)
             let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\Heap: %s\\%s" beginFrame textSize (beginCode "[Sharp]C") ps endCode textSize stack heap endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""

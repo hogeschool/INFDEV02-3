@@ -50,7 +50,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Coroutine.fs" />
     <Compile Include="CommonLatex.fs" />
+    <Compile Include="Runtime.fs" />
     <Compile Include="CodeDefinition.fs" />
+    <Compile Include="Interpreter.fs" />
     <Compile Include="SlideDefinition.fs" />
     <Compile Include="StateTraceSamples.fs" />
     <Compile Include="Week1.fs" />
