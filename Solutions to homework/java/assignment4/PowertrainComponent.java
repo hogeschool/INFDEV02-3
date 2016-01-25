@@ -1,5 +1,5 @@
 package assignment4;
 
-public interface PowertrainComponent extends Component{
+public interface PowerTrainComponent extends Component{
     float turn(float rpm);
 }

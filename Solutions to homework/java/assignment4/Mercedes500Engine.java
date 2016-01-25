@@ -1,12 +1,23 @@
 package assignment4;
 
-public class Mercedes500Engine extends Engine{
+public class Mercedes500Engine implements Engine{
 
-    public Mercedes500Engine() {
-        cylinders = 12;
-        horsePower = 517;
+    @Override
+    public int getCylinders() {
+        return 12;
     }
 
+    @Override
+    public int getHorsePower() {
+        return 517;
+    }
+
+    @Override
+    public float burn(float litersOfFuel){
+        return turn(litersOfFuel);
+    }
+
+    @Override
     public float turn(float fuel){
         return 3500 * fuel;
     }

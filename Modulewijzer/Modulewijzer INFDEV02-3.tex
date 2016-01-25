@@ -6,7 +6,7 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{fancyhdr}
 \usepackage{sectionbox}
-\usepackage[dutch]{babel}
+\usepackage[english]{babel}
 \usepackage{chngcntr}
 \usepackage{cite}
 \usepackage{url}
@@ -26,7 +26,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{color}
 \usepackage{fp}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \hypersetup{
     colorlinks=false,
     linkcolor=black,
@@ -47,6 +47,14 @@ mathescape=true,
 showstringspaces=false,
 showspaces=false,
 breaklines=true}
+
+%#####################################
+%Glossary
+%\usepackage{glossaries}
+\usepackage[toc,nonumberlist,nopostdot]{glossaries}
+\makeglossaries
+\input{Glossary}
+%\loadglsentries{Glossary}
 
 
 %\usepackage{showframe} %tmp
@@ -93,6 +101,7 @@ breaklines=true}
 
 \begin{document}
 
+
 %#####################################
 %Titlepage
 \begin{titlepage}
@@ -115,7 +124,7 @@ breaklines=true}
 \include{Modulebeschrijving}
 \newpage
 \include{AlgemeneOmschrijving}
-\newpage
+%\newpage
 \include{Programma}
 \newpage
 \include{Toetsing}
@@ -126,7 +135,10 @@ breaklines=true}
 \newpage
 %\bibliographystyle{plain}
 %\bibliography{references}
-%\newpage
+\glossarystyle{altlist}
+\printglossaries
+\newpage
+
 \input{Bijlage1}
 %\newpage
 %\input{tex/Bijlage2}

@@ -1,38 +1,36 @@
 package assignment4;
 
-public class Auto extends Entity{
-    private float positionX;
+import java.time.Duration;
+import java.util.List;
 
+public class Auto implements Entity{
+    Position positionX;
     FuelTank fuelTank;
     Engine engine;
     Gearbox gearbox;
-    Wheels wheels;
+    List<Wheel> wheel;
 
-    public Auto(float positionX, FuelTank fuelTank, Engine engine, Gearbox gearbox, Wheels wheels) {
+    public Auto(Position positionX, FuelTank fuelTank, Engine engine, Gearbox gearbox, List<Wheel> wheel) {
         this.positionX = positionX;
         this.fuelTank = fuelTank;
         this.engine = engine;
         this.gearbox = gearbox;
-        this.wheels = wheels;
+        this.wheel = wheel;
     }
 
     @Override
-    public float getPositionX() {
+    public Position getPositionX() {
         return positionX;
     }
 
-    public void setPositionX(float positionX) {
-        this.positionX = positionX;
-    }
-
-    public void drive(float timeDifference){
+    public void drive(Duration duration){
         if(fuelTank.getFuelAmount() > 0f){
-            float fuel  = fuelTank.pumpFuel(timeDifference);
-            float rpm_e = engine.turn(fuel);
+            float litersOfFuel  = fuelTank.pumpFuel(duration);
+            float rpm_e = engine.burn(litersOfFuel);
             float rpm_g = gearbox.turn(rpm_e);
-            float distance = wheels.turn(rpm_g);
+            float distance = wheel.get(0).turn(rpm_g);
 
-            positionX += distance;
+            positionX.add(new Position(distance));
 
             System.out.println("vroem");
         }else{
@@ -40,8 +38,8 @@ public class Auto extends Entity{
         }
     }
 
-    public void tick(float timeDifference){
-        drive(timeDifference);
+    public void tick(Duration duration){
+        drive(duration);
     }
 
     public void loadFuel(float fuelAmount){
