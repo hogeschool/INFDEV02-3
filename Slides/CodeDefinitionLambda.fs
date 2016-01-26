@@ -35,12 +35,22 @@ type Term =
       | Application(t,f) -> Application(t.Replace x u,f.Replace x u)
       | _ -> this
 
-    member this.ToLambdaCalculus code =
-      sprintf "%s ::= %s" (this.ToString()) (this.Reduce.ToString())
+    member this.ToLambdaCalculus code separator =
+      match this with
+      | Var x as v-> code + separator + v.ToString()
+      | Application(Var x,u) as a -> code + separator + a.ToString()
+      | Lambda(x,f) as l -> code + separator + l.ToString() 
+      | Application(Lambda(x,f),u) as a ->
+          let reduction = a.Reduce
+          reduction.ToLambdaCalculus (code + this.ToString() + separator + reduction.ToString()) separator
+      | Application(t,u) as a ->
+          let reduction = a.Reduce
+          reduction.ToLambdaCalculus (code + this.ToString() + separator + reduction.ToString()) separator
 
-let (!) x = Var x
-let (>>) t u = Application(t,u)
-let (=>) x t = Lambda(x, t)
+
+let (!!) x = Var x
+let (>>>) t u = Application(t,u)
+let (==>) x t = Lambda(x, t)
 
 let rec replace t x u =
   match t with
