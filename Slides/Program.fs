@@ -19,5 +19,6 @@
 [<EntryPoint>]
 let main argv = 
 //  do batchProcess StateTraceSamples.slides "stateTraces" "State traces test" true false
-  do batchProcess Week1.slides "week1" "Introduction" true false
+  do batchProcess FunctionalWeek1.slides "test" "Test" true false
+  //do batchProcess Week1.slides "week1" "Introduction" true false
   0

@@ -1,5 +1,6 @@
 ﻿module SlideDefinition
 open CodeDefinitionImperative
+open CodeDefinitionLambda
 open Coroutine
 open CommonLatex
 open Runtime
@@ -16,7 +17,8 @@ type SlideElement =
   | Block of SlideElement
   | Items of List<SlideElement>
   | PythonCodeBlock of TextSize * Code
-  | CSharpCodeBlock of TextSize *Code
+  | InferenceCodeBlock of TextSize * Term
+  | CSharpCodeBlock of TextSize * Code
   | Tiny
   | Small
   | Normal
@@ -44,6 +46,9 @@ type SlideElement =
       | PythonCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.AsPython "") endCode
+      | InferenceCodeBlock (ts, c) ->
+          let textSize = ts.ToString()
+          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.ToLambdaCalculus "") endCode
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "[Sharp]C") (c.AsCSharp "") endCode
@@ -77,6 +82,9 @@ type SlideElement =
       | PythonCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.AsPython "") endCode endFrame
+      | InferenceCodeBlock (ts, c) ->
+          let textSize = ts.ToString()
+          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.ToLambdaCalculus "") endCode endFrame
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C")  (c.AsCSharp "") endCode endFrame
