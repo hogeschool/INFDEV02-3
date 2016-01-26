@@ -48,7 +48,7 @@ type SlideElement =
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.AsPython "") endCode
       | InferenceCodeBlock (ts, c) ->
           let textSize = ts.ToString()
-          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.ToLambdaCalculus "" "=>\n") endCode
+          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.ToLambdaCalculus Option.None "" "=>\n") endCode
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "[Sharp]C") (c.AsCSharp "") endCode
@@ -84,7 +84,7 @@ type SlideElement =
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.AsPython "") endCode endFrame
       | InferenceCodeBlock (ts, c) ->
           let textSize = ts.ToString()
-          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.ToLambdaCalculus "" "=>\n") endCode endFrame
+          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.ToLambdaCalculus Option.None "" "=>\n") endCode endFrame
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C")  (c.AsCSharp "") endCode endFrame

@@ -35,17 +35,12 @@ type Term =
       | Application(t,f) -> Application(t.Replace x u,f.Replace x u)
       | _ -> this
 
-    member this.ToLambdaCalculus code separator =
-      match this with
-      | Var x as v-> code + separator + v.ToString()
-      | Application(Var x,u) as a -> code + separator + a.ToString()
-      | Lambda(x,f) as l -> code + separator + l.ToString() 
-      | Application(Lambda(x,f),u) as a ->
-          let reduction = a.Reduce
-          reduction.ToLambdaCalculus (code + this.ToString() + separator + reduction.ToString()) separator
-      | Application(t,u) as a ->
-          let reduction = a.Reduce
-          reduction.ToLambdaCalculus (code + this.ToString() + separator + reduction.ToString()) separator
+    member this.ToLambdaCalculus (old : Term option) (code : string) (separator : string) : string =
+      let newCode = code + (sprintf "%s" (this.ToString())) + " " + separator + "\n"
+      match old with
+      | None -> this.Reduce.ToLambdaCalculus (Some this) newCode separator
+      | Some r ->
+          if this.Reduce = r then code.TrimEnd(separator.ToCharArray()) else this.Reduce.ToLambdaCalculus (Some this) newCode separator
 
 
 let (!!) x = Var x
