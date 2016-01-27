@@ -95,9 +95,10 @@ let slides =
       TextBlock "Java"
       ItemsBlock
         [
-          ! @"Hugely used in businesses"
-          ! @"Immense ecosystem of tools and libraries"
+          ! @"Dominantly used in businesses"
+          ! @"Extremely Immense ecosystem of tools and libraries"
           ! @"Great support on most platforms"
+          ! @"A large community means dozens of libraries for most common tasks"
         ]
       TextBlock @"C\#"
       ItemsBlock
@@ -113,9 +114,8 @@ let slides =
       TextBlock "Java"
       ItemsBlock
         [
-          ! @"Very slow to evolve"
+          ! @"Slow to evolve, because of input from developers"
           ! @"Less clean design with lots of historical corner cases"
-          ! @"Too large a community means dozens of competing libraries for most common tasks"
         ]
       TextBlock @"C\#"
       ItemsBlock
@@ -212,7 +212,7 @@ let slides =
       ItemsBlock[ 
         ! @"Python operators translate almost directly to Java/C\#"
         ! @"Only exception are the logical operators"
-        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($\|$), and \texttt{and} becomes (\&\&)"
+        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($\|\|$), and \texttt{and} becomes (\&\&)"
       ]
 
       PythonCodeBlock(TextSize.Small,
