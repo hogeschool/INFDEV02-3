@@ -24,6 +24,7 @@ type Code =
   | Private of Code
   | Dots
   | End
+  | ToString of Code
   | None
   | Ref of string
   | Object of Map<string, Code>
@@ -45,6 +46,7 @@ type Code =
   | TypedSig of string * List<string * string> * string
   | Def of string * List<string> * Code
   | Call of string * List<Code>
+  | MainCall
   | MethodCall of string * string * List<Code>
   | StaticMethodCall of string * string * List<Code>
   | If of Code * Code * Code
@@ -97,7 +99,7 @@ type Code =
         let bs = (b.AsPython (pre + "  "))
         sprintf "%swhile %s:\n%s" pre (c.AsPython "") bs
       | Op(a,op,b) ->
-        sprintf "%s %s %s" ((a.AsPython "").Replace("\n","")) (op.AsPython) ((b.AsPython (pre + "  ")).Replace("\n",""))
+        sprintf "(%s %s %s)" ((a.AsPython "").Replace("\n","")) (op.AsPython) ((b.AsPython (pre + "  ")).Replace("\n",""))
       | Sequence (p,q) ->
         let res = sprintf "%s%s" (p.AsPython pre) (q.AsPython pre)
         res
@@ -116,9 +118,12 @@ type Code =
         (sprintf "%sstatic%s" pre (p.AsCSharp pre)).Replace("static" + pre, "static ")
       | Public p ->
         (sprintf "%spublic%s" pre (p.AsCSharp pre)).Replace("public" + pre, "public ")
+      | ToString p ->
+        (sprintf "%s%s.ToString()" pre (p.AsCSharp ""))
       | Object bs ->
         let argss = bs |> Map.remove "__type" |> Seq.map (fun a -> a.Key + "=" + (a.Value.AsCSharp "") + ", ") |> Seq.toList
         sprintf "%s%s" pre ((!+argss).TrimEnd[|','; ' '|])
+      | MainCall -> ""
       | End -> ""
       | None -> "null"
       | Dots -> "...\n"
@@ -149,7 +154,7 @@ type Code =
         if t = "" then sprintf "%s%s = %s;\n" pre s ((v.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
         else sprintf "%s%s %s = %s;\n" pre t s ((v.AsCSharp "").TrimEnd[|','; '\n'; ';'|])
       | Var s -> s
-      | ConstBool b -> b.ToString()
+      | ConstBool b -> b.ToString().ToLower()
       | ConstInt i -> i.ToString()
       | ConstFloat f -> f.ToString()
       | ConstString s -> sprintf "\"%s\"" s
@@ -178,11 +183,11 @@ type Code =
         let argss = args |> List.map (fun a -> (a.AsCSharp "").TrimEnd([|'\n'|]) + ",")
         sprintf "%s%s.%s(%s)\n" pre c m ((!+argss).TrimEnd[|','; '\n'; ';'|])
       | If(c,t,e) ->
-        sprintf "%sif(%s) {\n%s } else {\n%s }" pre (c.AsCSharp "") (t.AsCSharp (pre + "  ")) (e.AsCSharp (pre + "  "))
+        sprintf "%sif(%s) {\n%s } else {\n%s }\n" pre (c.AsCSharp "") (t.AsCSharp (pre + "  ")) (e.AsCSharp (pre + "  "))
       | While(c,b) ->
-        sprintf "%swhile(%s) {\n%s }" pre (c.AsCSharp "") (b.AsCSharp (pre + "  "))
+        sprintf "%swhile(%s) {\n%s }\n" pre (c.AsCSharp "") (b.AsCSharp (pre + "  "))
       | Op(a,op,b) ->
-        sprintf "%s %s %s" ((a.AsCSharp "").Replace("\n","").Replace(";","")) (op.AsCSharp) ((b.AsCSharp (pre + "  ")).Replace("\n","").Replace(";",""))
+        sprintf "(%s %s %s)" ((a.AsCSharp "").Replace("\n","").Replace(";","").Replace("  ","")) (op.AsCSharp) ((b.AsCSharp (pre + "")).Replace("\n","").Replace(";","").Replace("  ",""))
       | Sequence (p,q) ->
         sprintf "%s%s" (p.AsCSharp pre) (q.AsCSharp pre)
       | Hidden(_) -> ""
@@ -193,3 +198,37 @@ type Code =
       lines.Length
 
 
+
+let makeStatic c = Static(c)
+let makePublic c = Public(c)
+let makePrivate c = Private(c)
+let implements i = Implementation(i)
+let interfaceDef c m = InterfaceDef(c,m)
+let classDef c m = ClassDef(c,m)
+let (:=) x y = Assign(x,y)
+let newC c a = New(c,a)
+let constInt x = ConstInt(x)
+let constFloat x = ConstFloat(x)
+let constString x = ConstString(x)
+let dots = Dots
+let typedDecl x t = TypedDecl(x,t,Option.None)
+let typedDeclAndInit x t c = TypedDecl(x,t,Some c)
+let var x = Var(x)
+let ret x = Return(x)
+let def x l b = Def(x,l,b)
+let typedDef x l t b = TypedDef(x,l,t,b)
+let typedSig x l t = TypedSig(x,l,t)
+let call x l = Call(x,l)
+let staticMethodCall c m l = StaticMethodCall(c,m,l)
+let mainCall = MainCall
+let methodCall x m l = MethodCall(x,m,l)
+let ifelse c t e = If(c,t,e)
+let whiledo c b = While(c,b)
+let (.+) a b = Op(a, Plus, b)
+let (.-) a b = Op(a, Minus, b)
+let (.*) a b = Op(a, Times, b)
+let (./) a b = Op(a, DividedBy, b)
+let (.>) a b = Op(a, GreaterThan, b)
+let (>>) a b = Sequence(a, b)
+let endProgram = End
+let toString c = ToString c

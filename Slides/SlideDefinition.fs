@@ -48,7 +48,7 @@ type SlideElement =
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.AsPython "") endCode
       | InferenceCodeBlock (ts, c) ->
           let textSize = ts.ToString()
-          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.ToLambdaCalculus "" "=>\n") endCode
+          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.ToLambdaCalculus Option.None "" "=>\n") endCode
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "[Sharp]C") (c.AsCSharp "") endCode
@@ -84,7 +84,7 @@ type SlideElement =
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.AsPython "") endCode endFrame
       | InferenceCodeBlock (ts, c) ->
           let textSize = ts.ToString()
-          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.ToLambdaCalculus "" "=>\n") endCode endFrame
+          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.ToLambdaCalculus Option.None "" "=>\n") endCode endFrame
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C")  (c.AsCSharp "") endCode endFrame
@@ -100,8 +100,11 @@ type SlideElement =
         let ps = (p.AsPython "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
-            let stack,heap = st.AsSlideContent (function Hidden _ -> true | _ -> false) (fun c -> c.AsPython)
-            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\Heap: %s\\%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap endFrame
+            let stack,heap,output,input = st.AsSlideContent (function Hidden _ -> true | _ -> false) (fun c -> c.AsPython)
+            let input = if input = "" then "" else "Input: " + input + @"\\"
+            let output = if output = "" then "" else "Output: " + output + @"\\"
+            let heap = if heap = "" then "" else "Heap: " + heap + @"\\"
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\%s%s%s%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap input output endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | CSharpStateTrace(ts,p,st) ->
@@ -110,8 +113,11 @@ type SlideElement =
         let ps = (p.AsCSharp "").TrimEnd([|'\n'|])
         let stackTraceTables = 
           [ for st in stackTraces do 
-            let stack,heap = st.AsSlideContent (function Hidden _ -> true | _ -> false) (fun c -> c.AsCSharp)
-            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\Heap: %s\\%s" beginFrame textSize (beginCode "[Sharp]C") ps endCode textSize stack heap endFrame
+            let stack,heap,input,output = st.AsSlideContent (function Hidden _ -> true | _ -> false) (fun c -> c.AsCSharp)
+            let input = if input = "" then "" else "Input: " + input + @"\\"
+            let output = if output = "" then "" else "Output: " + output + @"\\"
+            let heap = if heap = "" then "" else "Heap: " + heap + @"\\"
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\%s%s%s%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap input output endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
       | _ -> failwith "Unsupported"
@@ -134,7 +140,7 @@ let (!!) = InlineCode
 let ItemsBlock l = l |> Items |> Block 
 let TextBlock l = l |> Text |> Block 
 
-let rec generateLatexFile title (slides:List<SlideElement>) =
+let rec generateLatexFile author title (slides:List<SlideElement>) =
   @"\documentclass{beamer}
 \usetheme[hideothersubsections]{HRTheme}
 \usepackage{beamerthemeHRTheme}
@@ -153,7 +159,7 @@ breaklines=true}
 
 \title{" + title + @"}
 
-\author{TEAM INFDEV}
+\author{" + author + @"}
 
 \institute{Hogeschool Rotterdam \\ 
 Rotterdam, Netherlands}

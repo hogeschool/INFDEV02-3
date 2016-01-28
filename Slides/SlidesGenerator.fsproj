@@ -58,6 +58,7 @@
     <Compile Include="StateTraceSamples.fs" />
     <Compile Include="Week1.fs" />
     <Compile Include="Week2.fs" />
+    <Compile Include="Working together as teachers.fs" />
     <Compile Include="FunctionalWeek1.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

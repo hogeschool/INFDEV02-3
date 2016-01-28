@@ -4,6 +4,7 @@ open CommonLatex
 open SlideDefinition
 open CodeDefinitionImperative
 open Interpreter
+open Runtime
 
 let slides = 
   [
@@ -13,9 +14,8 @@ let slides =
       [
         !"Intro to DEV3"
         !"What have we learned so far?"
-        !"What are types?"
-        !(@"(\textbf{Advanced}) Typing and semantic rules: how do we read them?")
-        !(@"Introduction to Java and C\# (\textbf{advanced}) with type rules and semantics")
+        !"Basic notions of types and declarations"
+        !(@"Introduction to Java and C\# with execution examples")
       ]
     
     Section("Introduction to DEV3")
@@ -95,9 +95,10 @@ let slides =
       TextBlock "Java"
       ItemsBlock
         [
-          ! @"Hugely used in businesses"
-          ! @"Immense ecosystem of tools and libraries"
+          ! @"Dominantly used in businesses"
+          ! @"Extremely Immense ecosystem of tools and libraries"
           ! @"Great support on most platforms"
+          ! @"A large community means dozens of libraries for most common tasks"
         ]
       TextBlock @"C\#"
       ItemsBlock
@@ -113,9 +114,8 @@ let slides =
       TextBlock "Java"
       ItemsBlock
         [
-          ! @"Very slow to evolve"
+          ! @"Slow to evolve, because of input from developers"
           ! @"Less clean design with lots of historical corner cases"
-          ! @"Too large a community means dozens of competing libraries for most common tasks"
         ]
       TextBlock @"C\#"
       ItemsBlock
@@ -146,11 +146,12 @@ let slides =
 
     TextBlock @"All snippets of Java and C\# that we will see now cannot (until we see the \texttt{Main}) just be pasted in an empty file and run like we did for Python!!!"
 
+    SubSection "Basic differences"
     VerticalStack[
       Small
 
       ItemsBlock[ 
-        ! @"Most basic Python constructs translate almost directly to JC\#"
+        ! @"Most basic Python constructs translate almost directly to Java/C\#"
         ! @"Lines and instructions always end with a semicolon (;)"
         ! @"Variables are always declared before use, specifying their type."
       ]
@@ -158,7 +159,7 @@ let slides =
       PythonCodeBlock(TextSize.Small,
           ("x" := (constInt 10 .+ constInt 20)))
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Small,
           (typedDecl "x" "int" >>
@@ -170,8 +171,16 @@ let slides =
           (typedDeclAndInit "x" "int" (constInt 10 .+ constInt 20)))
     ]
 
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+        (typedDeclAndInit "x" "int" (constInt 10 .+ constInt 20) >> endProgram),
+        RuntimeState<_>.Zero (constInt 1))
+
+
+    SubSection "Primitive data types"
     VerticalStack[
-      TextBlock @"JC\# support similar sets of primitive data types"
+      TextBlock @"Java/C\# support similar sets of primitive data types"
 
       ItemsBlock[ 
         ! @"integers in various sizes: \texttt{byte}, \texttt{short}, \texttt{int}, \texttt{long}, and many others"
@@ -196,29 +205,37 @@ let slides =
       TextBlock @"Some bugs may depend on attempts to write beyond the range or at a higher precision than supported by the type."
     ]
 
+    SubSection "Operators and expressions"
     VerticalStack[
       Small
 
       ItemsBlock[ 
-        ! @"Python operators translate almost directly to JC\#"
+        ! @"Python operators translate almost directly to Java/C\#"
         ! @"Only exception are the logical operators"
-        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($\|$), and \texttt{and} becomes (\&\&)"
+        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($\|\|$), and \texttt{and} becomes (\&\&)"
       ]
 
       PythonCodeBlock(TextSize.Small,
           ("b" := ((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5))
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Small,
-          (typedDeclAndInit "b" "bool" ((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5))
+          ((typedDeclAndInit "b" "bool" (((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5)) >> endProgram))
     ]
 
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+        ((typedDeclAndInit "b" "bool" (((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5)) >> endProgram),
+        RuntimeState<_>.Zero (constInt 1))
+
+    SubSection "Function calls"
     VerticalStack[
       Small
 
       ItemsBlock[ 
-        ! @"Python function calls translate directly to JC\#"
+        ! @"Python function calls translate directly to Java/C\#"
         ! @"Only difference is, again, the semicolon"
         ! @"Behaviour remains precisely the same"
       ]
@@ -226,26 +243,33 @@ let slides =
       PythonCodeBlock(TextSize.Tiny,
         (call "print" [call "int" [(call "input" [])]]))
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
-        (call "Console.WriteLine" [call "Int32.Parse" [(call "Console.ReadLine" [])]]))
+        (staticMethodCall "Console" "WriteLine" [staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])]]))
     ]
 
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+        ((staticMethodCall "Console" "WriteLine" [staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])]]) >> endProgram),
+        RuntimeState<_>.WithInput (constInt 1) ["100"])
+
+    SubSection "Control flow statements"
     ItemsBlock
       [
-        ! @"Java and C\#\footnote{From now on JC\#} are curly-bracket languages"
+        ! @"Java and C\# are curly-bracket languages"
         ! @"This means that any block of code must now appear between curly brackets \{ and \}"
         ! @"There are no more colons (:) to delimit declarations"
         ! @"Indentation remains important for the reader\footnote{And the student aiming for a passing grade!}, but the languages do not care"
-        ! @"Programs in JC\# tend to be longer in part because of this"
+        ! @"Programs in Java/C\# tend to be longer in part because of this"
       ]
 
     VerticalStack[
       Small
 
       ItemsBlock[ 
-        ! @"Python statements translate almost directly to JC\#"
+        ! @"Python statements translate almost directly to Java/C\#"
         ! @"Only difference are the brackets and the lack of semicolon"
         ! @"Behaviour remains precisely the same"
       ]
@@ -254,16 +278,25 @@ let slides =
         ("x" := (call "int" [(call "input" [])])) >>
         (ifelse (var "x" .> constInt 0) 
           ((call "print" [constString "greater"]))
-          ((call "print" [constString "smaller"]))))
+          ((call "print" [constString "smaller or equal"]))))
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
         (typedDeclAndInit "x" "int" (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
         (ifelse (var "x" .> constInt 0) 
           (call "Console.WriteLine" [constString "greater"])
-          (call "Console.WriteLine" [constString "smaller"])))
+          (call "Console.WriteLine" [constString "smaller or equal"])))
     ]
+
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+        ((typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
+         ((ifelse (var "x" .> constInt 0) 
+             (staticMethodCall "Console" "WriteLine" [constString "greater"])
+             (staticMethodCall "Console" "WriteLine" [constString "smaller or equal"])))),
+        RuntimeState<_>.WithInput (constInt 1) ["100"])
 
     VerticalStack[
       Small
@@ -275,7 +308,7 @@ let slides =
             (("cnt" := (var "cnt" .+ constInt 1)) >>
              ("x" := (var "x" ./ constInt 2))))))
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
         (typedDeclAndInit "x" "int" (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
@@ -285,15 +318,27 @@ let slides =
              ("x" := (var "x" ./ constInt 2))))))
     ]
 
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+        ((((typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
+           ((typedDeclAndInit "cnt" "int" (constInt 0)) >>
+            (whiledo (var "x" .> constInt 1) 
+              (("cnt" := (var "cnt" .+ constInt 1)) >>
+               ("x" := (var "x" ./ constInt 2)))))) >> 
+            staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram),
+        RuntimeState<_>.WithInput (constInt 1) ["32"])
+
+    SubSection "Classes"
     ItemsBlock
       [
-        ! @"JC\# are object-oriented languages"
+        ! @"Java/C\# are object-oriented languages"
         ! @"This means that (almost) everything is an \textbf{object}, that is an instance of a \textbf{class}"
-        ! @"All JC\# programs will therefore begin with a class definition"
+        ! @"All Java/C\# programs will therefore begin with a class definition"
       ]
 
     VerticalStack[
-      TextBlock @"A class in JC\# looks very much like a Python class, with some minor differences:"
+      TextBlock @"A class in Java/C\# looks very much like a Python class, with some minor differences:"
       ItemsBlock
         [
           ! @"\texttt{\_\_init\_\_} is a method with the name of the class itself"
@@ -309,7 +354,7 @@ let slides =
               def "__init__" ["self"] ("self.cnt" := constInt 0)
             ])
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           classDef "Counter" 
@@ -319,9 +364,10 @@ let slides =
             ])
     ]
 
+    SubSection "Visibility"
     ItemsBlock 
       [ 
-        ! @"We can limit visibility of attributes (and methods) in a class in JC\#;" 
+        ! @"We can limit visibility of attributes (and methods) in a class in Java/C\#;" 
         ! @"This means we can prevent a user of a class from accidentally using something in the wrong way" 
         ! @"Most important attributes are" 
         Items
@@ -368,6 +414,7 @@ let slides =
       TextBlock @"This suggests that Python is like Java/C\# where all class attributes are automatically declared as \texttt{public}."
     ]
 
+    SubSection "Methods"
     VerticalStack[
       TextBlock @"If we want to add methods, we also need to be aware of the type of each of their parameter and of the type they return."
 
@@ -378,7 +425,7 @@ let slides =
               def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
             ])
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           classDef "Counter" 
@@ -408,18 +455,38 @@ let slides =
           ((("c" := newC "Counter" []) >>
             (methodCall "c" "incr" [ConstInt 5]))))
 
-      TextBlock @"The above Python becomes, in both JC\#:"
+      TextBlock @"The above Python becomes, in both Java/C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           (classDef "Counter" 
             [
               typedDecl "cnt" "int" |> makePrivate
               typedDef "Counter" [] "" ("cnt" := constInt 0) |> makePublic
-              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
+              typedDef "incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
             ]) >>
+<<<<<<< HEAD
           (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
             (methodCall "c" "Incr" [ConstInt 5]))))
+=======
+          ((dots >>
+            ((typedDeclAndInit "c" "Counter" (newC "Counter" []))) >>
+             (methodCall "c" "incr" [ConstInt 5]))))
+>>>>>>> origin/master
     ]
+
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+        ((classDef "Counter" 
+            [
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
+              typedDef "incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
+            ]) >>
+           ((dots >>
+             (typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
+              (methodCall "c" "incr" [ConstInt 5])))) >> endProgram,
+        RuntimeState<_>.Zero (constInt 1))
 
     VerticalStack[
       TextBlock @"Method access determines where they can be called. Suppose \texttt{x} is of type \texttt{C}:"
@@ -461,6 +528,7 @@ let slides =
       TextBlock @"No, because \texttt{IncrB} is a private method."
     ]
 
+    SubSection "Static methods"
     TextBlock @"Surprisingly, both Java and C\# miss simple functions like those of Python: this means that they need to be emulated as methods."
 
     VerticalStack[
@@ -487,10 +555,22 @@ let slides =
               [
                 typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
               ])) >>
-           (dots >>
-            staticMethodCall "MyClass" "f" [ConstInt(10)]))
+           ((dots >>
+             (staticMethodCall "Console" "WriteLine" [staticMethodCall "MyClass" "f" [ConstInt(10)]])) >> endProgram))
     ]
 
+    TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
+
+    CSharpStateTrace(TextSize.Tiny,
+          (classDef "MyClass" 
+              [
+                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
+              ]) >>
+           ((dots >>
+             (staticMethodCall "Console" "WriteLine" [staticMethodCall "MyClass" "f" [ConstInt(10)]])) >> endProgram),
+            RuntimeState<_>.Zero (constInt 1))
+
+    SubSection "The \texttt{Main} method"
     ItemsBlock 
       [
         ! @"Java and C\# programs do not just begin at the top of a file."
@@ -506,15 +586,34 @@ let slides =
               [
                 typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
               ])))
+
+      Pause
+      TextBlock @"We will now run it: this is the first program we could copy in a file and just compile and run!"
     ]
 
+    CSharpStateTrace(TextSize.Tiny,
+        ((classDef "Program" 
+            [
+              typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
+            ] >> mainCall)),
+        RuntimeState<_>.Zero (constInt 1))
 
-//Arrays as primitive data types
-//\textbf{Advanced} lambda's
-//Multiple classes and files in Java
-//Add Java examples as well, with keywords for specific translation later instead of strings for the methods (such as read, parse, and print)
-//The Java examples appear after C# in a new slide, right beneath the C# example
-//Each C# example (but not the duplicated Java version) has its own stack and heap
+    Section("Conclusion")
+    SubSection("What have we seen so far?")
+    ItemsBlock
+      [
+        !"Intro to DEV3"
+        !"What we have learned so far: Python, from variables to basic classes"
+        !"Primitive types and declarations"
+        !(@"Introduction to Java and C\#: from variables to basic classes, with execution examples")
+      ]
+
+//TODO: Add Java examples as well, with keywords for specific translation later instead of strings for the methods (such as read, parse, and print)
+//TODO: The Java examples appear after C# in a new slide, right beneath the C# example
+
+//TODO: Arrays as primitive data types
+//TODO: \textbf{Advanced} lambda's
+//TODO: methodCall should take arbitrary expression, not variable names
 //
 //\SlideSection{Conclusion}
 //\SlideSubSection{Lecture topics}
