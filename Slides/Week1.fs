@@ -418,7 +418,7 @@ let slides =
               typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
             ]) >>
           (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
-            (methodCall "c" "incr" [ConstInt 5]))))
+            (methodCall "c" "Incr" [ConstInt 5]))))
     ]
 
     VerticalStack[
