@@ -1,8 +1,8 @@
-﻿let batchProcess source name title openPDF compileTwice =
+﻿let batchProcess source name author title openPDF compileTwice =
     let pdf = name + ".pdf"
     let tex = name + ".tex"
     do System.IO.File.Delete pdf
-    do System.IO.File.WriteAllText(tex, source |> SlideDefinition.generateLatexFile title)
+    do System.IO.File.WriteAllText(tex, source |> SlideDefinition.generateLatexFile author title)
     for i = 0 to (if compileTwice then 1 else 0) do
 //      let p = System.Diagnostics.ProcessStartInfo("pdflatex.exe", "-synctex=1 -interaction=nonstopmode " + tex)
       let p = System.Diagnostics.ProcessStartInfo("pdflatex.exe", "-synctex=1 -interaction=batchmode " + tex)
@@ -23,11 +23,12 @@
         do (System.Diagnostics.Process.Start(final_pdf)).WaitForExit()
       with
       | e -> printfn "Open PDF complaint: %A" e
-    do System.IO.File.Delete tex
+      do System.IO.File.Delete tex
 
 [<EntryPoint>]
 let main argv = 
-//  do batchProcess StateTraceSamples.slides "stateTraces" "State traces test" true false
-  //do batchProcess FunctionalWeek1.slides "test" "Test" true false
-  do batchProcess Week1.slides "week1" "Introduction" true false
+  //do batchProcess StateTraceSamples.slides "stateTraces" "The INFDEV team" "State traces test" true false
+  //do batchProcess FunctionalWeek1.slides "test" "The INFDEV team" "Test" true false
+  //do batchProcess Week1.slides "week1" "The INFDEV team" "Introduction" true false
+  do batchProcess Working_together_as_teachers.slides "working_together_as_teachers" "Dr. G. Maggiore" "Working together as teachers" true true
   0

@@ -140,7 +140,7 @@ let (!!) = InlineCode
 let ItemsBlock l = l |> Items |> Block 
 let TextBlock l = l |> Text |> Block 
 
-let rec generateLatexFile title (slides:List<SlideElement>) =
+let rec generateLatexFile author title (slides:List<SlideElement>) =
   @"\documentclass{beamer}
 \usetheme[hideothersubsections]{HRTheme}
 \usepackage{beamerthemeHRTheme}
@@ -159,7 +159,7 @@ breaklines=true}
 
 \title{" + title + @"}
 
-\author{TEAM INFDEV}
+\author{" + author + @"}
 
 \institute{Hogeschool Rotterdam \\ 
 Rotterdam, Netherlands}
