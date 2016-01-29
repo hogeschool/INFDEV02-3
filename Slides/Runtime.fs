@@ -24,10 +24,16 @@ type RuntimeState<'code> = { Stack : List<Map<string, 'code>>; HeapSize : int; H
       { Stack = [["PC", intOne] |> Map.ofList]; Heap = Map.empty; InputStream = []; HeapSize = 1; OutputStream = [] }
     static member WithInput intOne input =
       { Stack = [["PC", intOne] |> Map.ofList]; Heap = Map.empty; InputStream = input; HeapSize = 1; OutputStream = [] }
-    member this.AsSlideContent isHidden toString =
+    member this.AsSlideContent dots isHidden toString =
+      let stack = 
+        match this.Stack with
+        | [] -> []
+        | c::k ->
+          c :: [ for x in k do 
+                 yield Map.empty |> Map.add "..." dots |> Map.add "PC" (x.["PC"])]
       let stackFrames = 
         [
-          for sf in this.Stack do
+          for sf in stack do
           yield printBindings toString isHidden sf 
         ] |> List.rev
       let stackNamesByFrame = stackFrames |> List.map fst
@@ -37,7 +43,7 @@ type RuntimeState<'code> = { Stack : List<Map<string, 'code>>; HeapSize : int; H
 
       let hd = 
         [ 
-          for sf in this.Stack do
+          for sf in stack do
             yield [for v in sf do yield "c"]
         ] |> List.rev |> List.reduce (fun a b -> a @ (@">{\columncolor[gray]{0.8}}c" :: b))
       let stackTableContent = sprintf "%s \\\\\n\\hline\n%s \\\\\n\\hline\n" stackNames stackValues

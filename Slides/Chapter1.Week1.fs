@@ -1,4 +1,4 @@
-﻿module Week1
+﻿module Chapter1.Week1
 
 open CommonLatex
 open SlideDefinition
@@ -19,6 +19,15 @@ let slides =
       ]
     
     Section("Introduction to DEV3")
+    SubSection("Take pride in what you do")
+    ItemsBlock
+      [
+        !"The hardest part is over"
+        !"You have now really begun with learning to program"
+        !"We are proud of you and your results so far"
+        !"Remember to enjoy how much you are learning"
+      ]
+
     SubSection("Exam")
     ItemsBlock
       [
@@ -60,15 +69,6 @@ let slides =
         !"read every term on the slides and every sample"
         !"if you do not understand it perfectly, either ask a teacher, google, or brainstorm with other students"
         !(@"every sample of code on the slides you should both \textbf{understand} and \textbf{try out} on your machine")
-      ]
-
-    SubSection("Cooperation between SLC's and DEV")
-    ItemsBlock
-      [
-        !"we will aim towards a better comunication structure with SLC's"
-        !"we will use the homework as a measure of your study and effort"
-        !"we are more than willing to help you in any way we can, but without your work we cannot do anything\pause"
-        !"please learn to program, it is seriously awesome :)"
       ]
 
     Section @"What have we learnt so far?"
@@ -159,7 +159,7 @@ let slides =
       PythonCodeBlock(TextSize.Small,
           ("x" := (constInt 10 .+ constInt 20)))
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Small,
           (typedDecl "x" "int" >>
@@ -218,7 +218,7 @@ let slides =
       PythonCodeBlock(TextSize.Small,
           ("b" := ((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5))
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Small,
           ((typedDeclAndInit "b" "bool" (((constInt 10 .+ constInt 20) ./ constInt 2) .> constInt 5)) >> endProgram))
@@ -243,7 +243,7 @@ let slides =
       PythonCodeBlock(TextSize.Tiny,
         (call "print" [call "int" [(call "input" [])]]))
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
         (staticMethodCall "Console" "WriteLine" [staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])]]))
@@ -280,10 +280,10 @@ let slides =
           ((call "print" [constString "greater"]))
           ((call "print" [constString "smaller or equal"]))))
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
-        (typedDeclAndInit "x" "int" (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
+        (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(call "Console.ReadLine" [])])) >>
         (ifelse (var "x" .> constInt 0) 
           (call "Console.WriteLine" [constString "greater"])
           (call "Console.WriteLine" [constString "smaller or equal"])))
@@ -308,10 +308,10 @@ let slides =
             (("cnt" := (var "cnt" .+ constInt 1)) >>
              ("x" := (var "x" ./ constInt 2))))))
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
-        (typedDeclAndInit "x" "int" (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
+        (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(call "Console.ReadLine" [])])) >>
          ((typedDeclAndInit "cnt" "int" (constInt 0)) >>
           (whiledo (var "x" .> constInt 0) 
             (("cnt" := (var "cnt" .+ constInt 1)) >>
@@ -354,7 +354,7 @@ let slides =
               def "__init__" ["self"] ("self.cnt" := constInt 0)
             ])
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           classDef "Counter" 
@@ -425,7 +425,7 @@ let slides =
               def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
             ])
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           classDef "Counter" 
@@ -455,7 +455,7 @@ let slides =
           ((("c" := newC "Counter" []) >>
             (methodCall "c" "incr" [ConstInt 5]))))
 
-      TextBlock @"The above Python becomes, in both Java/C\#:"
+      TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
           (classDef "Counter" 
@@ -464,14 +464,9 @@ let slides =
               typedDef "Counter" [] "" ("cnt" := constInt 0) |> makePublic
               typedDef "incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
             ]) >>
-<<<<<<< HEAD
-          (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
-            (methodCall "c" "Incr" [ConstInt 5]))))
-=======
           ((dots >>
             ((typedDeclAndInit "c" "Counter" (newC "Counter" []))) >>
              (methodCall "c" "incr" [ConstInt 5]))))
->>>>>>> origin/master
     ]
 
     TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
@@ -604,20 +599,9 @@ let slides =
       [
         !"Intro to DEV3"
         !"What we have learned so far: Python, from variables to basic classes"
-        !"Primitive types and declarations"
+        !"Primitive types and declarations: an intuition about the type system"
         !(@"Introduction to Java and C\#: from variables to basic classes, with execution examples")
       ]
-
-//TODO: Add Java examples as well, with keywords for specific translation later instead of strings for the methods (such as read, parse, and print)
-//TODO: The Java examples appear after C# in a new slide, right beneath the C# example
-
-//TODO: Arrays as primitive data types
-//TODO: \textbf{Advanced} lambda's
-//TODO: methodCall should take arbitrary expression, not variable names
-//
-//\SlideSection{Conclusion}
-//\SlideSubSection{Lecture topics}
-//\begin{slide}{
-//\item What problem did we solve today, and how?
-//}\end{slide}
   ]
+
+// only last stack frame visualizing
