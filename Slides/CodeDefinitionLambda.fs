@@ -9,6 +9,10 @@ type Term =
   | Var of string
   | Application of Term * Term
   | Lambda of string * Term
+  | True
+  | False
+  | And
+  | Or
   with
     member this.ToLambda =
       match this with
@@ -30,6 +34,8 @@ let defaultTerms : Map<Term, Term> =
     !!"TRUE", ("t" ==> ("f" ==> (!!"t")))
     !!"FALSE", ("t" ==> ("f" ==> (!!"f")))
     !!"NOT", ("p" ==> ("a" ==> ("b" ==> (!!"p" >>> !!"b" >>> !!"a"))))
+    !!"AND", ("p" ==> ("q" ==> (!!"p" >>> !!"q" >>> !!"p")))
+    !!"OR", ("p" ==> ("q" ==> (!!"p" >>> !!"p" >>> !!"q")))
   ] |> Map.ofList
 
 let replace_default (t:Term) : Option<Term> =

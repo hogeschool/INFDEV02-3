@@ -39,7 +39,7 @@ let slides =
 //    LambdaStateTrace(TextSize.Tiny, (("x" ==> ("y" ==> ("z" ==> ("w" ==> (!!"x" >>> !!"y" >>> !!"z" >>> !!"w" ))))) >>> !!"8" >>> !!"=")>>> !!"=" >>> !!"D")
 //    LambdaStateTrace(TextSize.Tiny, (((ChurchNumerals.plus >>> !!"1") >>> !!"1") >>> !!"S") >>> !!"Z")
 //    LambdaStateTrace(TextSize.Tiny, (((ChurchNumerals.plus >>> ChurchNumerals.one) >>> ChurchNumerals.one) >>> !!"S") >>> !!"Z")
-    LambdaStateTrace(TextSize.Tiny, (((defaultTerms.[!!"NOT"] >>> defaultTerms.[!!"TRUE"]) >>> !!"T") >>> !!"F"))
+    LambdaStateTrace(TextSize.Tiny, (((defaultTerms.[!!"AND"] >>> defaultTerms.[!!"TRUE"] >>> defaultTerms.[!!"TRUE"]) >>> !!"T") >>> !!"F"))
 
     VerticalStack
       [
