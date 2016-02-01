@@ -5,20 +5,39 @@ open SlideDefinition
 open CodeDefinitionLambda
 open Interpreter
 
+module ChurchNumerals =
+  let zero = ("s" ==> ("z" ==> !!"z"))
+  let one = ("s" ==> ("z" ==> (!!"s" >>> !!"z")))
+  let two = ("s" ==> ("z" ==> (!!"s" >>> (!!"s" >>> !!"z"))))
+  let succ = ("n" ==> ("s" ==> ("z" ==> (!!"s" >>> ((!!"n" >>> !!"s") >>> !!"z")))))
+  let mult = ("m" ==> ("n" ==> ("s" ==> (!!"m" >>> (!!"n" >>> !!"s")))))
+  let plus = ("m" ==> ("n" ==> ("s" ==> ("z" ==> (!!"m" >>> !!"s") >>> ((!!"n" >>> !!"s") >>> !!"z")))))
+
 let slides =
-  let zero = ("f" ==> ("x" ==> !!"x"))
-  let one = ("f" ==> ("x" ==> (!!"f" >>> !!"x")))
-  let two = ("f" ==> ("x" ==> (!!"f" >>> (!!"f" >>> !!"x"))))
-  let succ = ("n" ==> ("f" ==> ("x" ==> (!!"f" >>> ((!!"n" >>> !!"f") >>> !!"x")))))
-  let mult = ("m" ==> ("n" ==> ("f" ==> (!!"m" >>> (!!"n" >>> !!"f")))))
-  let plus = ("m" ==> ("n" ==> ("f" ==> ("x" ==> (!!"m" >>> !!"f") >>> ((!!"n" >>> !!"f") >>> !!"x")))))
   [
     Section("Introduction")
     SubSection("Lecture topics")
-    InferenceCodeBlock(TextSize.Tiny, zero >>> !!"s" >>> !!"0")
-    InferenceCodeBlock(TextSize.Tiny, one >>> !!"s" >>> !!"0")
-    InferenceCodeBlock(TextSize.Tiny, two >>> !!"s" >>> !!"0")
-    InferenceCodeBlock(TextSize.Tiny, plus >>> !!"1" >>> !!"1" >>> !!"s" >>> !!"0")
-    InferenceCodeBlock(TextSize.Tiny, mult >>> !!"2" >>> !!"1" >>> !!"s" >>> !!"0")
+    VerticalStack
+      [
+        TextBlock "Numbers:"
+        LambdaCodeBlock(TextSize.Tiny, ChurchNumerals.zero)
+        LambdaCodeBlock(TextSize.Tiny, ChurchNumerals.one)
+        LambdaCodeBlock(TextSize.Tiny, ChurchNumerals.two)
+      ]
+
+    VerticalStack
+      [
+        TextBlock "Addition:"
+        LambdaCodeBlock(TextSize.Tiny, ChurchNumerals.plus)
+      ]
+
+    LambdaStateTrace(TextSize.Tiny, ("x" ==> !!"x") >>> !!"Z")
+    LambdaStateTrace(TextSize.Tiny, (((ChurchNumerals.plus >>> ChurchNumerals.one) >>> ChurchNumerals.one) >>> !!"S") >>> !!"Z")
+
+    VerticalStack
+      [
+        TextBlock "Multiplication:"
+        LambdaCodeBlock(TextSize.Tiny, ChurchNumerals.mult)
+      ]
   ]
 

@@ -1,4 +1,4 @@
-﻿module Chapter1.Week1
+﻿module Chapter1.Week1_2
 
 open CommonLatex
 open SlideDefinition

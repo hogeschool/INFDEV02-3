@@ -28,8 +28,8 @@
 [<EntryPoint>]
 let main argv = 
   //do batchProcess StateTraceSamples.slides "stateTraces" "The INFDEV team" "State traces test" true false
-  //do batchProcess FunctionalWeek1.slides "test" "The INFDEV team" "Test" true false
-  do batchProcess Chapter1.Week1.slides "week1" "The INFDEV team" "Introduction" true false
-  do batchProcess Chapter1.Week2.slides "week2" "The INFDEV team" "Type systems" true false
-  //do batchProcess Working_together_as_teachers.slides "working_together_as_teachers" "Dr. G. Maggiore" "Working together as teachers" true true
+  do batchProcess FunctionalWeek1.slides "fp_week1" "The INFDEV team" "Test" true false
+//  do batchProcess Chapter1.Week1_2.slides "dev3_week1_2" "The INFDEV team" "Introduction" true false
+//  do batchProcess Chapter1.Week3.slides "dev3_week3" "The INFDEV team" "Type systems" true false
+  //do batchProcess Working_together_as_teachers.slides "studiedag_working_together_as_teachers" "Dr. G. Maggiore" "Working together as teachers" true true
   0
