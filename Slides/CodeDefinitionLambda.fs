@@ -27,11 +27,28 @@ let (==>) x t = Lambda(x, t)
 
 let defaultTerms : Map<Term, Term> =
   [
-    !!"True", ("t" ==> ("f" ==> (!!"t")))
-    !!"False", ("t" ==> ("f" ==> (!!"f")))
-    !!"not", ("p" ==> ("q" ==> (!!"p" >>> !!"p" >>> !!"q"))) 
+    !!"TRUE", ("t" ==> ("f" ==> (!!"t")))
+    !!"FALSE", ("t" ==> ("f" ==> (!!"f")))
+    !!"NOT", ("p" ==> ("a" ==> ("b" ==> (!!"p" >>> !!"b" >>> !!"a"))))
   ] |> Map.ofList
 
+let replace_default (t:Term) : Option<Term> =
+  match defaultTerms |> Map.tryFind t with
+  | Some v -> Some v
+  | _ ->
+    match t with
+    | Var v ->
+      let res = ref 0
+      if System.Int32.TryParse(v, res) then
+        let mutable t = !!"z"
+        for i = 1 to res.Value do
+          t <- !!"s" >>> t
+        t <- "s" ==> ("z" ==> t)
+        Some t
+      else
+        Option.None
+    | _ -> 
+      Option.None
 
 let rec reduce p : Coroutine<(Term -> Term) * Term, bool> =
   let rec reduce_step p = 
@@ -39,7 +56,12 @@ let rec reduce p : Coroutine<(Term -> Term) * Term, bool> =
       let! (k,t) = getState
       match t with
       | Var x -> 
-        return false
+        match replace_default t with
+        | Some t' ->
+          do! setState (k, t')
+          return true
+        | _ ->
+          return false
       | Lambda(x,f) -> 
         return false
       | Application(Lambda(x,f),u) ->
