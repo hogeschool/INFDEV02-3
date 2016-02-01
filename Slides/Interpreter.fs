@@ -90,9 +90,11 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
   let interpret = interpret addThisToMethodArgs consName toString numberOfLines
   co{
     match p with
+    | Dots -> 
+      return None
     | None -> 
       return None
-    | Hidden c | Private c | Public c -> 
+    | Hidden c | Private c | Public c | Static c -> 
       return! interpret c
     | Ref _ as r ->
       return r
@@ -139,6 +141,14 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
         do! pause
         return! interpret body
       | _ -> return failwithf "Cannot find function %s" f            
+    | ToString(v) ->
+      let! v_val = interpret v
+      match v_val with
+      | ConstInt x -> return ConstString(x.ToString())
+      | ConstBool x -> return ConstString(x.ToString())
+      | ConstFloat x -> return ConstString(x.ToString())
+      | ConstString x -> return ConstString(x)
+      | _ -> return failwith "ToString() on objects is not yet implemented."
     | Op (a,op,b) -> 
       let! aVal = interpret a
       let! bVal = interpret b
@@ -150,15 +160,36 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
         | Minus -> return ConstInt(x - y)
         | DividedBy -> return ConstInt(x / y)
         | GreaterThan -> return ConstBool(x > y)
+      | ConstString x, ConstString y -> 
+        match op with
+        | Plus -> return ConstString(x + y)
+        | _ -> return failwithf "Cannot perform %s %s %s" (toString a) op.AsPython (toString b)
       | _ -> return failwithf "Cannot perform %s %s %s" (toString a) op.AsPython (toString b)
+    | While(c,body) ->
+      let! cVal = interpret c
+      let body_nl = body |> numberOfLines
+      match cVal with
+      | ConstBool true ->
+        let! res = interpret (Sequence(End,body))
+        do! changePC (fun pc -> pc - body_nl)
+        do! pause
+        return! interpret(While(c,body))
+      | ConstBool false ->
+        do! changePC ((+) ((body_nl) + 1))
+        return None
+      | _ -> return failwith "Malformed if"
     | If(c,t,e) ->
       let! cVal = interpret c
       match cVal with
       | ConstBool true ->
-        return! interpret (Sequence(End,t))
+        let! res = interpret (Sequence(End,t))
+        do! changePC ((+) ((e |> numberOfLines) + 2))
+        return res
       | ConstBool false ->
         do! changePC ((+) ((t |> numberOfLines) + 1))
-        return! interpret (Sequence(End,e))
+        let! res = interpret (Sequence(End,e))
+        do! incrPC
+        return res
       | _ -> return failwith "Malformed if"
     | Sequence (p,k) ->
       let! _ = interpret p
@@ -193,7 +224,8 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
     | ClassDef (n,ms) as cls ->
       let! pc = getPC
       let! s = getState
-      let! msVals = ms |> List.filter (function Implementation _ -> false | _ -> true) |> mapCo interpret
+      let allMethods = ms |> List.filter (function Implementation _ -> false | _ -> true)
+      let! msVals = allMethods |> mapCo interpret
       let mutable m_pc = pc + 1
       let fields = ms |> List.filter (function TypedDecl(_) | Private(TypedDecl(_)) | Public(TypedDecl(_)) -> true | _ -> false) 
                       |> List.map (fun f -> match f with 
@@ -202,12 +234,16 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
       let msValsByName = 
         fields @
         [
-          for m in msVals do
+          for m,m_orig in Seq.zip msVals allMethods do
             match m with
             | Assign(f,ConstLambda(_,args,body)) -> 
               let pc = m_pc + 1
-              m_pc <- m_pc + 1 + (body |> numberOfLines)
-              yield f,ConstLambda(pc,addThisToMethodArgs n args,body)
+              m_pc <- m_pc + 2 + (body |> numberOfLines)
+              match m_orig with
+              | Static _ -> 
+                yield f,ConstLambda(pc,args,body)
+              | _ -> 
+                yield f,ConstLambda(pc,addThisToMethodArgs n args,body)
             | _ -> 
               m_pc <- m_pc + 1
         ] |> Map.ofList
@@ -215,6 +251,25 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
       let nl = cls |> numberOfLines
       do! changePC ((+) (nl - 1))
       return None
+    | MainCall ->
+      return! interpret (StaticMethodCall("Program","Main",[None]))
+    | StaticMethodCall("Console","WriteLine",[arg]) ->
+      let! argVal = interpret arg
+      let! s = getState
+      do! setState { s with OutputStream = (argVal |> toString) :: s.OutputStream }
+      return None
+    | StaticMethodCall("Console","ReadLine",[]) ->
+      let! s = getState
+      do! setState { s with InputStream = s.InputStream.Tail }
+      do! pause
+      return ConstString(s.InputStream.Head)
+    | StaticMethodCall("Int32","Parse",[i]) ->
+      let! i_val = interpret i
+      match i_val with
+      | ConstString(s) ->
+        return ConstInt(System.Int32.Parse(s))
+      | _ -> 
+        return failwithf "Cannot convert %s to an integer" (i |> toString)
     | StaticMethodCall(c,m,argExprs) ->
       let! s = getState
       match s.Heap.[c] with
@@ -286,35 +341,3 @@ let rec interpret addThisToMethodArgs consName toString numberOfLines (p:Code) :
 
 let runPython p = interpret (fun _ args -> args) (fun _ -> "__init__") (fun c -> c.AsPython "") (fun c -> c.NumberOfPythonLines) p
 let runCSharp p = interpret (fun c args -> "this" :: args) id (fun c -> c.AsCSharp "") (fun c -> c.NumberOfCSharpLines) p
-
-let makeStatic c = Static(c)
-let makePublic c = Public(c)
-let makePrivate c = Private(c)
-let implements i = Implementation(i)
-let interfaceDef c m = InterfaceDef(c,m)
-let classDef c m = ClassDef(c,m)
-let (:=) x y = Assign(x,y)
-let newC c a = New(c,a)
-let constInt x = ConstInt(x)
-let constFloat x = ConstFloat(x)
-let constString x = ConstString(x)
-let dots = Dots
-let typedDecl x t = TypedDecl(x,t,Option.None)
-let typedDeclAndInit x t c = TypedDecl(x,t,Some c)
-let var x = Var(x)
-let ret x = Return(x)
-let def x l b = Def(x,l,b)
-let typedDef x l t b = TypedDef(x,l,t,b)
-let typedSig x l t = TypedSig(x,l,t)
-let call x l = Call(x,l)
-let staticMethodCall c m l = StaticMethodCall(c,m,l)
-let methodCall x m l = MethodCall(x,m,l)
-let ifelse c t e = If(c,t,e)
-let whiledo c b = While(c,b)
-let (.+) a b = Op(a, Plus, b)
-let (.-) a b = Op(a, Minus, b)
-let (.*) a b = Op(a, Times, b)
-let (./) a b = Op(a, DividedBy, b)
-let (.>) a b = Op(a, GreaterThan, b)
-let (>>) a b = Sequence(a, b)
-let endProgram = End
