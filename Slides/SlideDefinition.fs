@@ -146,7 +146,12 @@ type SlideElement =
         let textSize = ts.ToString()
         let states = (id,term) :: runToEnd (CodeDefinitionLambda.reduce pause) (id,term)
         let terms = states |> List.map (fun (k,t) -> k t)
-        failwith "Unsupported"
+        let stackTraceTables = 
+          [ for term in terms do 
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "ML") (term.ToLambda) endCode endFrame
+            yield slide ]
+        let res = stackTraceTables |> List.fold (+) ""
+        res
       | _ -> failwith "Unsupported"
 
 and TypingRule =

@@ -14,6 +14,7 @@ let pause : Coroutine<'s,Unit> = fun s -> Pause(s,ret())
 type CoroutineBuilder() =
   member this.ReturnFrom p = p
   member this.Return x = ret x
+  member this.Zero() = ret ()
   member this.Bind(p,k) = p >>= k
   member this.Combine(p,k) = p >>= (fun () -> k)
 let co = CoroutineBuilder()
