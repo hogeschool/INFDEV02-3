@@ -1,4 +1,4 @@
-﻿namespace SlidesGenerator.AssemblyInfo
+﻿namespace Dev3.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -7,11 +7,11 @@ open System.Runtime.InteropServices
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("SlidesGenerator")>]
+[<assembly: AssemblyTitle("Dev3")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("")>]
-[<assembly: AssemblyProduct("SlidesGenerator")>]
+[<assembly: AssemblyProduct("Dev3")>]
 [<assembly: AssemblyCopyright("Copyright ©  2016")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
@@ -22,7 +22,7 @@ open System.Runtime.InteropServices
 [<assembly: ComVisible(false)>]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[<assembly: Guid("86cacb78-7ae5-4626-8aea-917cef11c02a")>]
+[<assembly: Guid("ac821330-cafb-4e9a-92bc-ed6e89c508da")>]
 
 // Version information for an assembly consists of the following four values:
 // 
