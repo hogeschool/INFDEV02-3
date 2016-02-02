@@ -86,58 +86,61 @@ let deltaRules (t:Term) : Option<Term> =
     | _ -> 
       Option.None
 
-let rec reduce p : Coroutine<(Term -> Term) * Term, bool> =
+let rec reduce maxSteps p : Coroutine<(Term -> Term) * Term, bool> =
   let rec reduce_step p = 
     co{
-      let! (k,t) = getState
-      match t with
-      | Highlighted t ->
-        do! setState((fun t -> k t), t)
-        let! res = reduce p
-        let! (_,t) = getState
-        do! setState((fun t -> k(Highlighted(t))), t)
-        return res
-      | Var x -> 
+      if maxSteps <= 0 then
         return false
-      | Lambda(x,f) -> 
-        return false
-      | Application(Lambda(x,f),u) ->
-          do! setState ((fun u -> k(Application(Lambda(x,f),u))), u)
-          let! replaced = reduce_step p
-          do! if replaced then p else ret ()
-          let! (k1,v) = getState
-          do! setState ((fun v -> k(Highlighted(Application(Lambda(x,f),v)))), v)
-          do! p
-          let f_new = replace f x v
-          do! setState (k,f_new)
-          do! p
-          return true
-      | Application(Var x,u) -> 
-        return false
-      | Application(t,u) ->
-          do! setState ((fun t -> k(Application(t,u))), t)
-          let! replacedT = reduce_step p
-          let! (k1,t_new) = getState
-          do! setState ((fun u -> k(Application(t_new,u))), u)
-          let! replacedU = reduce_step p
-          let! (k2,u_new) = getState
-          do! setState (k, Application(t_new,u_new))
-          return replacedT || replacedU
-      | t -> 
-        match deltaRules t with
-        | Some t' ->
-          do! setState (k, Highlighted(t))
-          do! p
-          do! setState (k, t')
-          do! p
-          return true
-        | _ ->
+      else
+        let! (k,t) = getState
+        match t with
+        | Highlighted t ->
+          do! setState((fun t -> k t), t)
+          let! res = reduce_step p
+          let! (_,t) = getState
+          do! setState((fun t -> k(Highlighted(t))), t)
+          return res
+        | Var x -> 
           return false
+        | Lambda(x,f) -> 
+          return false
+        | Application(Lambda(x,f),u) ->
+            do! setState ((fun u -> k(Application(Lambda(x,f),u))), u)
+            let! replaced = reduce_step p
+            do! if replaced then p else ret ()
+            let! (k1,v) = getState
+            do! setState ((fun v -> k(Highlighted(Application(Lambda(x,f),v)))), v)
+            do! p
+            let f_new = replace f x v
+            do! setState (k,f_new)
+            do! p
+            return true
+        | Application(Var x,u) -> 
+          return false
+        | Application(t,u) ->
+            do! setState ((fun t -> k(Application(t,u))), t)
+            let! replacedT = reduce_step p
+            let! (k1,t_new) = getState
+            do! setState ((fun u -> k(Application(t_new,u))), u)
+            let! replacedU = reduce_step p
+            let! (k2,u_new) = getState
+            do! setState (k, Application(t_new,u_new))
+            return replacedT || replacedU
+        | t -> 
+          match deltaRules t with
+          | Some t' ->
+            do! setState (k, Highlighted(t))
+            do! p
+            do! setState (k, t')
+            do! p
+            return true
+          | _ ->
+            return false
     }
   co{
     let! replaced = reduce_step p
     if replaced then
-      return! reduce p
+      return! reduce (maxSteps-1) p
     else
       return false
   }

@@ -5,14 +5,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>86cacb78-7ae5-4626-8aea-917cef11c02a</ProjectGuid>
+    <ProjectGuid>ac821330-cafb-4e9a-92bc-ed6e89c508da</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SlidesGenerator</RootNamespace>
-    <AssemblyName>SlidesGenerator</AssemblyName>
+    <RootNamespace>Dev3</RootNamespace>
+    <AssemblyName>Dev3</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
-    <Name>SlidesGenerator</Name>
+    <Name>Dev3</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\SlidesGenerator.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Dev3.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -34,7 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Release\SlidesGenerator.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Dev3.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
@@ -48,27 +48,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Coroutine.fs" />
-    <Compile Include="CommonLatex.fs" />
-    <Compile Include="Runtime.fs" />
-    <Compile Include="CodeDefinitionImperative.fs" />
-    <Compile Include="CodeDefinitionLambda.fs" />
-    <Compile Include="Interpreter.fs" />
-    <Compile Include="SlideDefinition.fs" />
-    <Compile Include="StateTraceSamples.fs" />
     <Compile Include="Chapter1.Week1_2.fs" />
     <Compile Include="Chapter1.Week3.fs" />
-    <Compile Include="Working together as teachers.fs" />
-    <Compile Include="FunctionalWeek1.fs" />
-    <Compile Include="FunctionalWeek2.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
-    <None Include="beamerthemeHRTheme.sty">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="logoHRBig.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Slides\LatexSlidesGenerator.fsproj">
+      <Name>LatexSlidesGenerator</Name>
+      <Project>{86cacb78-7ae5-4626-8aea-917cef11c02a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

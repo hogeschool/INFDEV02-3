@@ -28,7 +28,7 @@ type SlideElement =
   | VerticalStack of List<SlideElement>
   | PythonStateTrace of TextSize * Code * RuntimeState<Code>
   | CSharpStateTrace of TextSize * Code * RuntimeState<Code>
-  | LambdaStateTrace of TextSize * Term
+  | LambdaStateTrace of TextSize * Term * Option<int>
   with
     member this.ToStringAsElement() = 
       match this with
@@ -54,7 +54,7 @@ type SlideElement =
           sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.AsPython "") endCode, []
       | LambdaCodeBlock(ts, c) ->
           let textSize = ts.ToString()
-          sprintf @"\lstset{basicstyle=\ttfamily%s}%s%s%s" textSize (beginCode "Python") (c.ToLambda) endCode, []
+          sprintf @"\lstset{basicstyle=\ttfamily%s}\lstset{numbers=none}%s%s%s" textSize (beginCode "Python") (c.ToLambda) endCode, []
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           let javaVersion = "\n\n" + sprintf @"%s %sWhich in Java then becomes:%s \lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame beginExampleBlock endExampleBlock textSize (beginCode "Java") (c.AsJava "") endCode endFrame
@@ -102,7 +102,7 @@ type SlideElement =
           sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "Python") (c.AsPython "") endCode endFrame
       | LambdaCodeBlock (ts, c) ->
           let textSize = ts.ToString()
-          sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "ML") (c.ToLambda) endCode endFrame
+          sprintf @"%s\lstset{basicstyle=\ttfamily%s}\lstset{numbers=none}%s%s%s%s" beginFrame textSize (beginCode "ML") (c.ToLambda) endCode endFrame
       | CSharpCodeBlock (ts,c) ->
           let textSize = ts.ToString()
           (sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "[Sharp]C")  (c.AsCSharp "") endCode endFrame) + "\n\n" +
@@ -142,9 +142,14 @@ type SlideElement =
             let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s Stack: %s\\%s%s%s%s" beginFrame textSize (beginCode "Python") ps endCode textSize stack heap input output endFrame
             yield slide ]
         stackTraceTables |> List.fold (+) ""
-      | LambdaStateTrace(ts,term) ->
+      | LambdaStateTrace(ts,term,maxSteps) ->
         let textSize = ts.ToString()
-        let states = (id,term) :: runToEnd (CodeDefinitionLambda.reduce pause) (id,term)
+        let states = 
+          match maxSteps with
+          | Some maxSteps ->
+            (id,term) :: runToEnd (CodeDefinitionLambda.reduce maxSteps pause) (id,term)
+          | _ ->
+            (id,term) :: runToEnd (CodeDefinitionLambda.reduce System.Int32.MaxValue pause) (id,term)
         let terms = states |> List.map (fun (k,t) -> k t)
         let stackTraceTables = 
           [ for term,term' in Seq.zip terms (Seq.tail terms) do 
