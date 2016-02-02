@@ -54,7 +54,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Slides\LatexSlidesGenerator.fsproj">
+    <ProjectReference Include="..\..\LatexSlideGenerator\Slides\LatexSlidesGenerator.fsproj">
       <Name>LatexSlidesGenerator</Name>
       <Project>{86cacb78-7ae5-4626-8aea-917cef11c02a}</Project>
       <Private>True</Private>
