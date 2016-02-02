@@ -60,6 +60,7 @@
     <Compile Include="Chapter1.Week3.fs" />
     <Compile Include="Working together as teachers.fs" />
     <Compile Include="FunctionalWeek1.fs" />
+    <Compile Include="FunctionalWeek2.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="beamerthemeHRTheme.sty">

@@ -147,8 +147,8 @@ type SlideElement =
         let states = (id,term) :: runToEnd (CodeDefinitionLambda.reduce pause) (id,term)
         let terms = states |> List.map (fun (k,t) -> k t)
         let stackTraceTables = 
-          [ for term in terms do 
-            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}%s%s%s%s" beginFrame textSize (beginCode "ML") (term.ToLambda) endCode endFrame
+          [ for term,term' in Seq.zip terms (Seq.tail terms) do 
+            let slide = sprintf @"%s\lstset{basicstyle=\ttfamily%s}\lstset{numbers=none}%s%s%s\pause%s%s%s%s" beginFrame textSize (beginCode "ML") (term.ToLambda) endCode (beginCode "ML") (term'.ToLambda) endCode endFrame
             yield slide ]
         let res = stackTraceTables |> List.fold (+) ""
         res
@@ -179,9 +179,11 @@ let rec generateLatexFile author title (slides:List<SlideElement>) =
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage[space]{grffile}
+\usepackage{soul,xcolor}
 \usepackage{listings}
 \lstset{language=C,
 basicstyle=\ttfamily\footnotesize,
+escapeinside={(*@}{@*)},
 mathescape=true,
 breaklines=true}
 \lstset{
