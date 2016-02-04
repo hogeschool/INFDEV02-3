@@ -329,6 +329,12 @@ let slides =
             staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram),
         RuntimeState<_>.WithInput (constInt 1) ["32"])
 
+    SubSection "Part I"
+    TextBlock @"End of part I"
+
+    SubSection "Part II"
+    TextBlock @"Beginning of part II"
+
     SubSection "Classes"
     ItemsBlock
       [
@@ -604,4 +610,4 @@ let slides =
       ]
   ]
 
-// only last stack frame visualizing
+// arrays

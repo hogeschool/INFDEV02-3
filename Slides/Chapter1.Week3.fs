@@ -75,7 +75,7 @@ let slides =
                  (call "g" [constInt -1])
                  (call "g" [var "mercedesSL500"])))
       Pause
-      TextBlock ">100000"
+      TextBlock @"$\ge 100000$"
       ]
 
     ItemsBlock
@@ -108,6 +108,17 @@ let slides =
         ! "In other languages (mostly functional languages like F\#, Haskell, etc.) the type of variables is automatically guessed by the compiler"
         ! "In our case our programs will become a bit more verbose but better specified"
         ! "Still, static typing is not necessarily connected with verbosity"
+      ]
+
+    VerticalStack[
+      TextBlock @"A variable declaration in C\# or Java is prefixed by the type of the variable"
+
+      ItemsBlock [
+          ! @"\texttt{int x;} declares an integer variable"
+          ! @"\texttt{string s;} declares a string variable"
+          ! @"\texttt{float f;} declares a floating point variable"
+          ! @"..."
+        ]
       ]
 
     VerticalStack[
@@ -154,11 +165,11 @@ let slides =
           call "g" [constInt -1]))
       TextBlock "Becomes, typed:"
       CSharpCodeBlock(TextSize.Normal,
-         (typedDef "g" ["Car","car"] "void" (ret (methodCall "car" "drive" [constInt 2])) >>
+         (typedDef "g" ["Car","car"] "int" (ret (methodCall "car" "drive" [constInt 2])) >>
           call "g" [constInt -1])) |> Unrepeated
       Question @"What has improved and why?"
       Pause
-      TextBlock "The function declaration specifies available methods of \texttt{car}. We will thus get a compiler error."
+      TextBlock @"The function declaration specifies that \texttt{car} is an instance of the \texttt{Car} class. We will thus get a compiler error."
       ]
 
     Section "Typing rules and semantic rules"
@@ -198,7 +209,7 @@ let slides =
       VerticalStack[
         TypingRules[
           {
-            Premises = [@"\text{I have my umbrella with me}"; @"\text{It is raining}"]
+            Premises = [@"\text{It is raining}"; @"\text{I have my umbrella with me}"]
             Conclusion = @"\text{I open my umbrella}"
           }
         ]
@@ -213,60 +224,380 @@ let slides =
         !"Let us apply this machinery to programming languages"
         !"We will effectively give the specification of a modern compiler"
         !"This looks like a ``broadly scoped'' execution of the program, and it is indeed such"
-        !"Instead of having a coupling of the variables with values in the stack and the heap, we maintain a coupling of the variables with their declared type"
+        !"This process is called type checking"
       ]
+
+    Advanced(
+      ItemsBlock[
+        ! @"We want to specify this in the typing rule notation"
+        ! @"The typing rules manipulate a stack of declarations which we will call $D$"
+        ! @"Each typing rule will add or remove variable declarations and return the type of the current expression"
+        ! @"Instead of coupling each variable with its value, we couple it with its type"
+      ])
 
     Advanced(
       VerticalStack[
         ItemsBlock[
-          ! "We want to specify this in the typing rule notation"
-          ! "The typing rules manipulate a stack of declarations"
-          ! "x : int"
-        ]
+            ! @"The simplest typing rule is the one that finds a variable declaration"
+            ! @"A declaration adds to the declarations $D$ the variable, connected with its type"
+          ]
+
         TypingRules[
           {
-            Premises = [@"\mathtt{c : Boolean}"; @"\mathtt{a : void}"; @"\mathtt{b : void}"]
-            Conclusion = @"\mathtt{if\ c\ then\ a\ else\ b\ :\ void}"
+            Premises = []
+            Conclusion = @"\langle (\mathtt{T\ v;}), D \rangle \rightarrow \langle \mathtt{void}, D[v \mapsto T] \rangle"
           }
-        ]
-        TextBlock "If a part of a program does not have a type derived through the typing rules (also void is fine), then the whole program cannot be run and we get a compiler error"
-        ])
+        ]])
 
-    // primitive types, and basic declaration
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"When we look the variable up, its type is whatever type was found connected to it in the declarations"
+            ! @"This does further nothing to the declarations"
+            ! @"Let's assume that \texttt{x} is a variable name"
+          ]
 
+        TypingRules[
+          {
+            Premises = []
+            Conclusion = @"\langle \mathtt{x}, D \rangle \rightarrow \langle D[\mathtt{x}], D \rangle"
+          }
+        ]])
 
-//    TextBlock @"We can use typing rules\footnote{In this case we simply call them \textbf{inference rules}} in a broader scope: also for specifying the semantics of constructs"
-//
-//    ItemsBlock[
-//      !! "if c then a else b"
-//      ! "What does this do?"
-//      Pause
-//      ! "if c evaluates to True, then we evaluate a"
-//      ! "if c evaluates to False, then we evaluate b"
-//    ]
-//
-//    Advanced(
-//      VerticalStack[
-//        ItemsBlock[
-//          ! "We want to specify this in the inference rule notation"
-//          ! @"Assume that $\rightarrow$ means ""evaluates to"", as in:"
-//          ! @"$3+1 \rightarrow 4$"
-//        ]
-//        Tiny
-//        TypingRules[
-//          {
-//            Premises = [@"\langle c,S,H \rangle \rightarrow \langle True,S',H' \rangle"; @"\langle a,S',H' \rangle \rightarrow \langle res,S'',H'' \rangle"]
-//            Conclusion = @"\langle \mathtt{if\ c\ then\ a\ else\ b},S,H \rangle \rightarrow \langle res,S'',H'' \rangle"
-//          }
-//          {
-//            Premises = [@"\langle c,S,H \rangle \rightarrow \langle False,S',H' \rangle"; @"\langle b,S',H' \rangle \rightarrow \langle res,S'',H'' \rangle"]
-//            Conclusion = @"\langle \mathtt{if\ c\ then\ a\ else\ b},S,H \rangle \rightarrow \langle res,S'',H'' \rangle"
-//          }
-//        ]])
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Another simple typing rule is the one that types a constant value"
+            ! @"It does nothing to the declarations"
+            ! @"Let's assume that \texttt{i} is an integer constant"
+          ]
+
+        TypingRules[
+          {
+            Premises = []
+            Conclusion = @"\langle \mathtt{i}, D \rangle \rightarrow \langle \mathtt{int}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Let's assume that \texttt{f} is a floating point constant"
+          ]
+
+        TypingRules[
+          {
+            Premises = []
+            Conclusion = @"\langle \mathtt{f}, D \rangle \rightarrow \langle \mathtt{float}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Let's assume that \texttt{s} is a string constant"
+          ]
+
+        TypingRules[
+          {
+            Premises = []
+            Conclusion = @"\langle \mathtt{s}, D \rangle \rightarrow \langle \mathtt{string}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Let's assume that \texttt{b} is a boolean constant"
+          ]
+
+        TypingRules[
+          {
+            Premises = []
+            Conclusion = @"\langle \mathtt{b}, D \rangle \rightarrow \langle \mathtt{bool}, D \rangle"
+          }
+        ]])
+
+    TextBlock "More complex typing rules compose together the types of different statements"
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"The typing rule for operators such as \texttt{+} requires the operands to be compatible"
+            ! @"The type of both operands is often the same, for example \texttt{int} or \texttt{float}"
+            ! @"The resulting type is then the type of both operands"
+            ! @"Operands do not modify the current declarations"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{int}, D \rangle"
+                        @"\langle \mathtt{b}, D \rangle \rightarrow \langle \mathtt{int}, D \rangle"]
+            Conclusion = @"\langle (\mathtt{a+b}), D \rangle \rightarrow \langle \mathtt{int}, D \rangle"
+          }
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{float}, D \rangle"
+                        @"\langle \mathtt{b}, D \rangle \rightarrow \langle \mathtt{float}, D \rangle"]
+            Conclusion = @"\langle (\mathtt{a+b}), D \rangle \rightarrow \langle \mathtt{float}, D \rangle"
+          }
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{string}, D \rangle"
+                        @"\langle \mathtt{b}, D \rangle \rightarrow \langle \mathtt{string}, D \rangle"]
+            Conclusion = @"\langle (\mathtt{a+b}), D \rangle \rightarrow \langle \mathtt{string}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"The type of both operands could differ, but still be compatible (for example adding an \texttt{int} and a \texttt{float})"
+            ! @"The resulting type is then the most generic type of the operands"
+            ! @"Operands do not modify the current declarations"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{int}, D \rangle"
+                        @"\langle \mathtt{b}, D \rangle \rightarrow \langle \mathtt{float}, D \rangle"]
+            Conclusion = @"\langle (\mathtt{a+b}), D \rangle \rightarrow \langle \mathtt{float}, D \rangle"
+          }
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{float}, D \rangle"
+                        @"\langle \mathtt{b}, D \rangle \rightarrow \langle \mathtt{int}, D \rangle"]
+            Conclusion = @"\langle (\mathtt{a+b}), D \rangle \rightarrow \langle \mathtt{float}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Statements in a sequence both modify, top-to-bottom, the declarations"
+            ! @"Usually we expect the statements to simply return nothing, that is \texttt{void}"
+            ! @"Further we cannot say anything about what they each do"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{void}, D_1 \rangle"
+                        @"\langle \mathtt{b}, D_1 \rangle \rightarrow \langle \mathtt{void}, D_2 \rangle"]
+            Conclusion = @"\langle (\mathtt{a;b}), D \rangle \rightarrow \langle \mathtt{void}, D_2 \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"The typing rule for an \texttt{if-then-else} requires the condition to be a boolean expression, and assumes the type of both the then and the else bodies"
+            ! @"The type of both the then and the else bodies must be the same (usually \texttt{void}, something else in case of function returns)"
+            ! @"It does not add anything to the declarations, even though the bodies of the then and the else might declare local variables"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{c}, D \rangle \rightarrow \langle \mathtt{bool}, D \rangle"
+                        @"\langle \mathtt{A}, D \rangle \rightarrow \langle \mathtt{T}, D' \rangle"
+                        @"\langle \mathtt{B}, D \rangle \rightarrow \langle \mathtt{U}, D' \rangle"
+                        @"T = U"]
+            Conclusion = @"\langle (\mathtt{if\ c\ \{\ A\ \} else \{\ B\ \}}), D \rangle \rightarrow \langle \mathtt{T}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"The typing rule for a \texttt{while} loop requires the condition to be a boolean expression, and assumes the type of the body"
+            ! @"The type of the body can be anything (usually \texttt{void}, something else in case of function returns)"
+            ! @"It does not add anything to the declarations, even though the body might declare local variables"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{c}, D \rangle \rightarrow \langle \mathtt{bool}, D \rangle"
+                        @"\langle \mathtt{B}, D \rangle \rightarrow \langle \mathtt{T}, D_1 \rangle"]
+            Conclusion = @"\langle (\mathtt{while\ c\ \{\ A\ \}}), D \rangle \rightarrow \langle \mathtt{T}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"The typing rule for a \texttt{class} declaration adds the class declaration to the declarations with all its fields and methods"
+            ! @"When adding the declaration of the class, we have to check that the types of the method bodies match their declarations"
+            ! @"Assume that \texttt{C} is the class name, $f_i$ is the i-th field in the class (of type $F_i$), and \texttt{m}$_j$ is the j-th method in the class (with type $M_j$)"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"D_1 := D[C \mapsto [..\ f_i \mapsto F_i\ ..\ m_j \mapsto M_j\ ..]] "
+                        @"\langle \mathtt{M_j\ m_j}, D_1[\mathtt{this} \mapsto C] \rangle \rightarrow \langle M^1_j, D_2 \rangle"
+                        @"M_j = M^1_j"]
+            Conclusion = @"\langle (\mathtt{class\ C\ \{\ ..F_i\ f_i..\ \ ..M_j\ m_j..\ \}}), D \rangle \rightarrow \langle \mathtt{T}, D_1 \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"When type checking a \texttt{method} declaration (within a class declaration} we type check its body and compare the result with the type of the declaration"
+            ! @"Assume that \texttt{C} is the class name, $p_i$ is the i-th parameter of the method (of type $P_i$), and \texttt{b} is the method body"
+            ! @"The type of a method is of the form $P_1 \times P_2 \times \dots \times P_n \rightarrow R$, where $P_l$ is the type of the l-th parameter and $R$ is the return type"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle (\mathtt{b}), D[..p_l \mapsto P_l..] \rangle \rightarrow \langle \mathtt{R}, D_1 \rangle"]
+            Conclusion = @"\langle (\mathtt{R\ m(..P_l\ p_l..)b}), D \rangle \rightarrow \langle (P_1 \times P_2 \times \dots \times P_n \rightarrow R), D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"When type checking a \texttt{return} statement, we typecheck its argument"
+            ! @"The type of the argument is also the type of the \texttt{return} statement"
+            ! @"There is no change to the declarations"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{x}, D \rangle \rightarrow \langle \mathtt{T}, D \rangle"]
+            Conclusion = @"\langle (\mathtt{return\ x}), D \rangle \rightarrow \langle T, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Statements in a sequence might contain \texttt{return} statements"
+            ! @"In this case one of them might not return \texttt{void}"
+            ! @"Their sequence will assume the non-\texttt{void} type"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{T}, D_1 \rangle"
+                        @"\langle \mathtt{b}, D_1 \rangle \rightarrow \langle \mathtt{void}, D_2 \rangle"]
+            Conclusion = @"\langle (\mathtt{a;b}), D \rangle \rightarrow \langle \mathtt{T}, D_2 \rangle"
+          }
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{void}, D_1 \rangle"
+                        @"\langle \mathtt{b}, D_1 \rangle \rightarrow \langle \mathtt{T}, D_2 \rangle"]
+            Conclusion = @"\langle (\mathtt{a;b}), D \rangle \rightarrow \langle \mathtt{T}, D_2 \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Statements in a sequence might contain \texttt{return} statements"
+            ! @"They might both return a non-\texttt{void} type"
+            ! @"Their sequence will assume the non-\texttt{void} type of both, which must be the same"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{a}, D \rangle \rightarrow \langle \mathtt{T}, D_1 \rangle"
+                        @"\langle \mathtt{b}, D_1 \rangle \rightarrow \langle \mathtt{U}, D_2 \rangle"
+                        @"T = U"]
+            Conclusion = @"\langle (\mathtt{a;b}), D \rangle \rightarrow \langle \mathtt{T}, D_2 \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Sometimes we may look a field $f$ up from an instance $x$ of a class"
+            ! @"This assumes the type of the field, which needs to be looked up in the class descriptor found in the declarations"
+            ! @"No declaration is further modified"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{x}, D \rangle \rightarrow \langle \mathtt{C}, D \rangle"
+                        @"\langle \mathtt{f}, C \rangle \rightarrow \langle \mathtt{F}, C \rangle"
+                        @"T = U"]
+            Conclusion = @"\langle (\mathtt{x.f}), D \rangle \rightarrow \langle \mathtt{F}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"Sometimes we may call a method $m$ up from an instance $x$ of a class and with parameters $p_i$"
+            ! @"This assumes the return type of the method, provided that all parameter types match the types expected by the method"
+            ! @"No declaration is further modified"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{x}, D \rangle \rightarrow \langle \mathtt{C}, D \rangle"
+                        @"\langle \mathtt{m}, C \rangle \rightarrow \langle (\mathtt{P}_1 \times \mathtt{P}_2 \times \dots \times \mathtt{P}_n \rightarrow \mathtt{R}), C \rangle"
+                        @"\langle \mathtt{p_i}, D \rangle \rightarrow \langle \mathtt{P}'_i, D \rangle"
+                        @"\mathtt{P}_i = \mathtt{P}'_i"]
+            Conclusion = @"\langle (\mathtt{x.f(..p_i..)}), D \rangle \rightarrow \langle \mathtt{R}, D \rangle"
+          }
+        ]])
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
+            ! @"We may call a static method $m$ from class $C$ and with parameters $p_i$"
+            ! @"This assumes the return type of the method, provided that all parameter types match the types expected by the method"
+            ! @"We do not need to look up the class because it is already specified in the call"
+            ! @"No declaration is further modified"
+          ]
+
+        Tiny
+
+        TypingRules[
+          {
+            Premises = [@"\langle \mathtt{m}, C \rangle \rightarrow \langle (\mathtt{P}_1 \times \mathtt{P}_2 \times \dots \times \mathtt{P}_n \rightarrow \mathtt{R}), C \rangle"
+                        @"\langle \mathtt{p_i}, D \rangle \rightarrow \langle \mathtt{P}'_i, D \rangle"
+                        @"\mathtt{P}_i = \mathtt{P}'_i"]
+            Conclusion = @"\langle (\mathtt{C.f(..p_i..)}), D \rangle \rightarrow \langle \mathtt{R}, D \rangle"
+          }
+        ]])
+
+    ItemsBlock[
+        ! @"The constructor of a class is simply a specially named static method"
+        ! @"It has no further typing rules"
+      ]
+
+    Section("Conclusion")
+    SubSection("Looking back")
+    ItemsBlock
+      [
+        !"Issues with Python"
+        !"Static typing as a way to run a coarse simulation of the program"
+      ]
   ]
 
-//remove the : notation, and use T v instead
-
-//TODO: Arrays as primitive data types
-//TODO: \textbf{Advanced} lambda's
+//TODO: examples of code after every type derivation with execution of the type checker with declarations stack
 //TODO: methodCall should take arbitrary expression, not variable names
+//TODO: overloading
+//TODO: arrays as primitive data types
+//TODO: lambda's

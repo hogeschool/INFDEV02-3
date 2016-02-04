@@ -50,6 +50,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Chapter1.Week1_2.fs" />
     <Compile Include="Chapter1.Week3.fs" />
+    <Compile Include="StateTraceSamples.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
   </ItemGroup>
