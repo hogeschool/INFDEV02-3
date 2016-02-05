@@ -5,20 +5,16 @@ open SlideDefinition
 open CodeDefinitionImperative
 open Interpreter
 open Runtime
+open TypeChecker
 
 let slides = 
   [
-    CSharpTypeTrace(TextSize.Tiny,
-        ((classDef "Counter" 
-            [
-              typedDecl "cnt" "int" |> makePrivate
-              typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
-              typedDef "incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
-            ]) >>
-           ((dots >>
-             ((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
-               (methodCall "c" "incr" [ConstInt 5])))) >> endProgram),
-        RuntimeState<_>.Zero (constInt 1))
+//    CSharpTypeTrace(TextSize.Tiny,
+//        (
+//           ((dots >>
+//             ((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
+//               (methodCall "c" "incr" [ConstInt 5])))) >> endProgram),
+//        RuntimeState<_>.Zero (constInt 1))
 
     CSharpStateTrace(TextSize.Tiny,
           (classDef "MyClass" 

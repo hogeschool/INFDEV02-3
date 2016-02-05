@@ -5,6 +5,7 @@ open SlideDefinition
 open CodeDefinitionImperative
 open Interpreter
 open Runtime
+open TypeChecker
 
 let slides = 
   [
@@ -219,6 +220,7 @@ let slides =
         ])
 
     TextBlock "Let us apply this machinery to programming languages"
+
     ItemsBlock 
       [      
         !"Let us apply this machinery to programming languages"
@@ -249,6 +251,10 @@ let slides =
           }
         ]])
 
+    CSharpTypeTrace(TextSize.Tiny,
+        ((typedDeclAndInit "x" "int" (ConstInt 10)) >> endProgram),
+        TypeCheckingState<Code>.Zero)
+
     Advanced(
       VerticalStack[
         ItemsBlock[
@@ -263,6 +269,11 @@ let slides =
             Conclusion = @"\langle \mathtt{x}, D \rangle \rightarrow \langle D[\mathtt{x}], D \rangle"
           }
         ]])
+
+    CSharpTypeTrace(TextSize.Tiny,
+        (((typedDeclAndInit "x" "int" (ConstInt 10))) >>
+           ("x" := (var"x" .+ (ConstInt 5))) >> endProgram),
+        TypeCheckingState<Code>.Zero)
 
     Advanced(
       VerticalStack[
@@ -390,6 +401,12 @@ let slides =
           }
         ]])
 
+    CSharpTypeTrace(TextSize.Tiny,
+        ((typedDeclAndInit "x" "int" (ConstInt 10)) >>
+         ((typedDeclAndInit "y" "int" (ConstInt 20)) >>
+           ("x" := (var"x" .+ var"y")) >> endProgram)),
+        TypeCheckingState<Code>.Zero)
+
     Advanced(
       VerticalStack[
         ItemsBlock[
@@ -409,6 +426,14 @@ let slides =
             Conclusion = @"\langle (\mathtt{if\ c\ \{\ A\ \} else \{\ B\ \}}), D \rangle \rightarrow \langle \mathtt{T}, D \rangle"
           }
         ]])
+
+    CSharpTypeTrace(TextSize.Tiny,
+        ((typedDeclAndInit "x" "int" (ConstInt 10)) >>
+         ((typedDeclAndInit "y" "int" (ConstInt 20)) >>
+           (ifelse (var"x" .> var"y") 
+                   ((typedDeclAndInit "z" "string" (ConstString "x")) >> staticMethodCall "Console" "WriteLine" [var "z"]) 
+                   ((typedDeclAndInit "z" "string" (ConstString "y")) >> staticMethodCall "Console" "WriteLine" [var "z"])) >> endProgram)),
+        TypeCheckingState<Code>.Zero)
 
     Advanced(
       VerticalStack[
@@ -464,6 +489,16 @@ let slides =
           }
         ]])
 
+    CSharpTypeTrace(TextSize.Tiny,
+        ((classDef "Counter" 
+            [
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" (("this.cnt" := constInt 0) >> endProgram) |> makePublic
+              typedDef "incr" ["int","diff"] "void" (("this.cnt" := (var "this.cnt" .+ var "diff")) >> endProgram) |> makePublic
+            ]) >>
+          endProgram),
+        TypeCheckingState<Code>.Zero)
+
     Advanced(
       VerticalStack[
         ItemsBlock[
@@ -480,6 +515,16 @@ let slides =
             Conclusion = @"\langle (\mathtt{return\ x}), D \rangle \rightarrow \langle T, D \rangle"
           }
         ]])
+
+    CSharpTypeTrace(TextSize.Tiny,
+        ((classDef "Counter" 
+            [
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" (("this.cnt" := constInt 0) >> endProgram) |> makePublic
+              typedDef "incr" ["int","diff"] "int" ((("this.cnt" := (var "this.cnt" .+ var "diff")) >> (ret (var "this.cnt"))) >> endProgram) |> makePublic
+            ]) >>
+          endProgram),
+        TypeCheckingState<Code>.Zero)
 
     Advanced(
       VerticalStack[
@@ -523,6 +568,8 @@ let slides =
           }
         ]])
 
+    // TODO: sample
+
     Advanced(
       VerticalStack[
         ItemsBlock[
@@ -541,6 +588,8 @@ let slides =
             Conclusion = @"\langle (\mathtt{x.f}), D \rangle \rightarrow \langle \mathtt{F}, D \rangle"
           }
         ]])
+
+    // TODO: sample
 
     Advanced(
       VerticalStack[
@@ -561,6 +610,8 @@ let slides =
             Conclusion = @"\langle (\mathtt{x.f(..p_i..)}), D \rangle \rightarrow \langle \mathtt{R}, D \rangle"
           }
         ]])
+
+    // TODO: sample
 
     Advanced(
       VerticalStack[
@@ -587,6 +638,8 @@ let slides =
         ! @"It has no further typing rules"
       ]
 
+    // TODO: sample
+
     Section("Conclusion")
     SubSection("Looking back")
     ItemsBlock
@@ -594,6 +647,8 @@ let slides =
         !"Issues with Python"
         !"Static typing as a way to run a coarse simulation of the program"
       ]
+
+    // TODO: conclusion
   ]
 
 //TODO: examples of code after every type derivation with execution of the type checker with declarations stack
