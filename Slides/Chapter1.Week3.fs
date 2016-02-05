@@ -647,8 +647,6 @@ let slides =
         !"Issues with Python"
         !"Static typing as a way to run a coarse simulation of the program"
       ]
-
-    // TODO: conclusion
   ]
 
 //TODO: examples of code after every type derivation with execution of the type checker with declarations stack
