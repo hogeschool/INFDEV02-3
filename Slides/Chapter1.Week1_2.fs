@@ -37,15 +37,15 @@ let slides =
         !(@"no grade: go (score$\ge$75) or no go (otherwise)")
       ]
 
-    SubSection("Homework")
+    SubSection("Exercises")
     ItemsBlock
       [
-        !"homework to prepare step-by-step"
+        !"exercises to prepare step-by-step"
         !"builds up to actual practicum"
         !"there is no grade for this"
       ]
 
-    SubSection("Practicum assignments")
+    SubSection("Assignments")
     ItemsBlock
       [
         !"a connected series of programming tasks"
@@ -57,7 +57,7 @@ let slides =
     SubSection("Oral")
     ItemsBlock
       [
-        !"the oral is entirely based on the practicum assignments"
+        !"the oral is entirely based on the assignments"
         !"we remove some pieces of code from the working solutions and you fill them back in"
         !"the oral gives you the final grade for the course"
       ]
