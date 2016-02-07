@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Dev3", "Dev3.fsproj", "{AC821330-CAFB-4E9A-92BC-ED6E89C508DA}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "LatexSlidesGenerator", "..\..\LatexSlideGenerator\Slides\LatexSlidesGenerator.fsproj", "{86CACB78-7AE5-4626-8AEA-917CEF11C02A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC821330-CAFB-4E9A-92BC-ED6E89C508DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC821330-CAFB-4E9A-92BC-ED6E89C508DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC821330-CAFB-4E9A-92BC-ED6E89C508DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC821330-CAFB-4E9A-92BC-ED6E89C508DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86CACB78-7AE5-4626-8AEA-917CEF11C02A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86CACB78-7AE5-4626-8AEA-917CEF11C02A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86CACB78-7AE5-4626-8AEA-917CEF11C02A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86CACB78-7AE5-4626-8AEA-917CEF11C02A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

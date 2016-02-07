@@ -438,7 +438,7 @@ let slides =
             [
               typedDecl "cnt" "int" |> makePrivate
               typedDef "Counter" [] "" ("cnt" := constInt 0) |> makePublic
-              typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
+              typedDef "incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
             ])
     ]
 
@@ -498,15 +498,15 @@ let slides =
                 typedDecl "a" "int" |> makePrivate
                 typedDecl "b" "int" |> makePublic
                 typedDef "C" [] "" (("this.a" := constInt 0) >> ("this.b" := constInt 0)) |> makePublic
-                typedDef "IncrA" ["int","diff"] "void" ("this.a" := (var "this.a" .+ var "diff")) |> makePublic
-                typedDef "IncrB" ["int","diff"] "void" ("this.b" := (var "this.b" .+ var "diff")) |> makePrivate
+                typedDef "incrA" ["int","diff"] "void" ("this.a" := (var "this.a" .+ var "diff")) |> makePublic
+                typedDef "incrB" ["int","diff"] "void" ("this.b" := (var "this.b" .+ var "diff")) |> makePrivate
               ])) >>
             (dots >>
-             methodCall "x" "IncrA" [ConstInt 10]))
+             methodCall "x" "incrA" [ConstInt 10]))
 
       Question @"Will this program be allowed to run?"
       Pause
-      TextBlock @"Yes, because \texttt{IncrA} is a public method."
+      TextBlock @"Yes, because \texttt{incrA} is a public method."
     ]
 
     VerticalStack[
@@ -518,15 +518,15 @@ let slides =
                 typedDecl "a" "int" |> makePrivate
                 typedDecl "b" "int" |> makePublic
                 typedDef "C" [] "" (("this.a" := constInt 0) >> ("this.b" := constInt 0)) |> makePublic
-                typedDef "IncrA" ["int","diff"] "void" ("this.a" := (var "this.a" .+ var "diff")) |> makePublic
-                typedDef "IncrB" ["int","diff"] "void" ("this.b" := (var "this.b" .+ var "diff")) |> makePrivate
+                typedDef "incrA" ["int","diff"] "void" ("this.a" := (var "this.a" .+ var "diff")) |> makePublic
+                typedDef "incrB" ["int","diff"] "void" ("this.b" := (var "this.b" .+ var "diff")) |> makePrivate
               ])) >>
             (dots >>
-             methodCall "x" "IncrB" [ConstInt 10]))
+             methodCall "x" "incrB" [ConstInt 10]))
 
       Question @"Will this program be allowed to run?"
       Pause
-      TextBlock @"No, because \texttt{IncrB} is a private method."
+      TextBlock @"No, because \texttt{incrB} is a private method."
     ]
 
     SubSection "Static methods"
@@ -544,7 +544,7 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           classDef "MyClass" 
             [
-              typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
+              typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makeStatic |> makePublic 
             ])
     ]
 
@@ -554,7 +554,7 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           ((classDef "MyClass" 
               [
-                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
+                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makeStatic |> makePublic 
               ])) >>
            ((dots >>
              (staticMethodCall "Console" "WriteLine" [staticMethodCall "MyClass" "f" [ConstInt(10)]])) >> endProgram))
@@ -565,7 +565,7 @@ let slides =
     CSharpStateTrace(TextSize.Tiny,
           (classDef "MyClass" 
               [
-                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
+                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10))))  |> makeStatic |> makePublic
               ]) >>
            ((dots >>
              (staticMethodCall "Console" "WriteLine" [staticMethodCall "MyClass" "f" [ConstInt(10)]])) >> endProgram),
@@ -585,7 +585,7 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           ((classDef "Program" 
               [
-                typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
+                typedDef "main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makeStatic |> makePublic 
               ])))
 
       Pause
@@ -595,7 +595,7 @@ let slides =
     CSharpStateTrace(TextSize.Tiny,
         ((classDef "Program" 
             [
-              typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
+              typedDef "main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makeStatic |> makePublic
             ] >> mainCall)),
         RuntimeState<_>.Zero (constInt 1))
 
