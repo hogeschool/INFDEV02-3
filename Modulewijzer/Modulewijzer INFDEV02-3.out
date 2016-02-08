@@ -1,13 +1,13 @@
 \BOOKMARK [1][-]{section.1}{General description}{}% 1
 \BOOKMARK [2][-]{subsection.1.1}{Relationship with other teaching units}{section.1}% 2
 \BOOKMARK [1][-]{section.2}{Course program}{}% 3
-\BOOKMARK [2][-]{subsection.2.1}{Lesson 1 - statically typed programming languages}{section.2}% 4
-\BOOKMARK [2][-]{subsection.2.2}{Lesson 2 - reuse through polymorphism and generics}{section.2}% 5
-\BOOKMARK [1][-]{section.3}{Assessment}{}% 6
-\BOOKMARK [2][-]{subsection.3.1}{Theoretical examination INFDEV02-3}{section.3}% 7
-\BOOKMARK [2][-]{subsection.3.2}{Practical examination INFDEV02-3}{section.3}% 8
-\BOOKMARK [3][-]{paragraph.3.2.0.1}{Question 1: }{subsection.3.2}% 9
-\BOOKMARK [4][-]{paragraph.3.2.0.2}{Question 2: }{paragraph.3.2.0.1}% 10
-\BOOKMARK [4][-]{paragraph.3.2.0.3}{Question 3: }{paragraph.3.2.0.1}% 11
-\BOOKMARK [4][-]{paragraph.3.2.0.4}{Question 4: }{paragraph.3.2.0.1}% 12
-\BOOKMARK [1][-]{section*.8}{Glossary}{}% 13
+\BOOKMARK [2][-]{subsection.2.1}{Chapter 1 - statically typed programming languages}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.2}{Chapter 2 - reuse through polymorphism}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.3}{Chapter 3 - reuse through generics}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Chapter 4 - architectural considerations}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.5}{Chapter 5 - yet more architectural considerations}{section.2}% 8
+\BOOKMARK [1][-]{section.3}{Assessment}{}% 9
+\BOOKMARK [2][-]{subsection.3.1}{Theoretical examination INFDEV02-3}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Practical examination INFDEV02-3}{section.3}% 11
+\BOOKMARK [3][-]{paragraph.3.2.0.1}{Question 1: }{subsection.3.2}% 12
+\BOOKMARK [4][-]{paragraph.3.2.0.2}{Question 2: }{paragraph.3.2.0.1}% 13

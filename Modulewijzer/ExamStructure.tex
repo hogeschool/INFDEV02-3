@@ -1,91 +1,364 @@
-\section*{Theoretical examination \modulecode}
-The general shape of a theoretical exam for \texttt{DEV 3} is made up of a series of highly structured open questions.
+\section*{Structure of exam \modulecode}
+The general shape of a theoretical exam for \texttt{DEV 3} is made up of only two, highly structured open questions.
 
 \paragraph{Question 1: } \ \\
 
-\textbf{Concrete example of question:} \textit{}
+\textbf{General shape of the question:} \textit{Given the following class definitions, and a piece of code that uses them, fill in the stack, heap, and PC with all steps taken by the program at runtime.}
 
-\ \\ 
+\textbf{Concrete example of question:}
 
-\textbf{Concrete example of answer:} \textit{}
+\lstset{numbers=left,basicstyle=\ttfamily\small}\lstset{language=[Sharp]C}
+\begin{lstlisting}
+interface ICounter {
+  void Incr(int diff);
+}
+class Counter : ICounter {
+  private int cnt;
+  public Counter() {
+    this.cnt = 0;
+  }
+  public void Incr(int diff) {
+    this.cnt = (this.cnt + diff);
+  }
+}
+ICounter c = new Counter();
+c.Incr(5);
+\end{lstlisting}
 
-\ \\
+\textbf{Concrete example of answer:}
 
-\textbf{Points:} \textit{25\%.}
+{
+\small
+\begin{enumerate}
+\item Stack: 
+\begin{tabular}{ |c| }
+		\hline
+		PC \\
+		\hline
+		1 \\
+		\hline
+		
+\end{tabular}
+	\\
 
-\ \\ 
+\item Stack: \begin{tabular}{ |c| }
+		\hline
+		PC \\
+		\hline
+		13 \\
+		\hline
+		
+	\end{tabular}
 
-\textbf{Grading:} \textit{}
+Heap: \begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt= \end{tabular} \\
+		\hline
+		
+	\end{tabular}\\
 
-\ \\ 
+\item Stack: \begin{tabular}{ |c|c|>{\columncolor[gray]{0.8}}c|c|c|c| }
+		\hline
+		PC & ... & & PC & ret & this \\
+		\hline
+		13 & ...
+		& & 7 & null & ref 1 \\
+		\hline
+		
+	\end{tabular}
 
-\textbf{Associated learning objective:} \texttt{ABS}
+Heap: 
+\begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt= \end{tabular} \\
+		\hline
+		
+	\end{tabular}\\
+
+\item Stack: \begin{tabular}{ |c|c|>{\columncolor[gray]{0.8}}c|c|c| }
+		\hline
+		PC & ... & & PC & ret \\
+		\hline
+		13 & ...
+		& & 7 & null \\
+		\hline
+		
+	\end{tabular}
+	\\Heap: \begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt=0 \end{tabular} \\
+		\hline
+		
+	\end{tabular}\\
+
+\item Stack: \begin{tabular}{ |c|c| }
+		\hline
+		PC & c \\
+		\hline
+		14 & ref 1 \\
+		\hline
+		
+	\end{tabular}
+	\\Heap: \begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt=0 \end{tabular} \\
+		\hline
+		
+	\end{tabular}\\
+
+\item Stack: \begin{tabular}{ |c|c|>{\columncolor[gray]{0.8}}c|c|c|c|c| }
+		\hline
+		PC & ... & & PC & ret & diff & this \\
+		\hline
+		14 & ...
+		& & 10 & null & 5 & ref 1 \\
+		\hline
+		
+	\end{tabular}
+	\\Heap: \begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt=0 \end{tabular} \\
+		\hline
+		
+	\end{tabular}\\
+
+\item Stack: \begin{tabular}{ |c|c|>{\columncolor[gray]{0.8}}c|c|c| }
+		\hline
+		PC & ... & & PC & ret \\
+		\hline
+		14 & ...
+		& & 10 & null \\
+		\hline
+		
+	\end{tabular}
+	\\Heap: \begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt=5 \end{tabular} \\
+		\hline
+		
+	\end{tabular}\\
+
+\item Stack: \begin{tabular}{ |c|c| }
+		\hline
+		PC & c \\
+		\hline
+		15 & ref 1 \\
+		\hline
+		
+	\end{tabular}
+	\\Heap: \begin{tabular}{ |c| }
+		\hline
+		1 \\
+		\hline
+		\begin{tabular}{c} cnt=5 \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\end{enumerate}
+}
+
+\textbf{Points:} \textit{4 (50\% of total).}
+
+\textbf{Grading:} \textit{Full points for more than 90\% of correct names and values. Three points if at least all names are correctly placed on the stack with at least half the values correct. Half points for more than 40\% of correct names and values. Zero points otherwise.}
+
+\textbf{Associated learning objective:} \glsfirst{abs}
 
 \ \\ 
 
 \paragraph{Question 2: } \ \\
 
-\textbf{Concrete example of question:} \textit{}
+\textbf{General shape of question:} \textit{Given the following class definitions, and a piece of code that uses them, fill in the declarations, class definitions, and PC with all steps taken by the compiler while type checking.}
 
-\ \\
+\textbf{Concrete example of question:} 
 
-\textbf{Concrete example of answer:} \textit{}
-
-\ \\
-
-\textbf{Points:} \textit{25\%.}
-
-\ \\
-
-\textbf{Grading:} \textit{}
-
-\ \\
-
-\textbf{Associated learning objective:} \texttt{ENC}
-
-\ \\
-
-\paragraph{Question 3: } \ \\
-
-\textbf{Concrete example of question:} \textit{}
-
-\ \\
+\lstset{numbers=left,basicstyle=\ttfamily\small}\lstset{language=[Sharp]C}
+\begin{lstlisting}
+interface ICounter {
+  void Incr(int diff);
+}
+class Counter : ICounter {
+  private int cnt;
+  public Counter() {
+    this.cnt = 0;
+  }
+  public void Incr(int diff) {
+    this.cnt = (this.cnt + diff);
+  }
+}
+ICounter c = new Counter();
+c.Incr(5);
+\end{lstlisting}
 
 \textbf{Concrete example of answer:} \textit{}
 
+{
+	\small
+	\begin{enumerate}
+\item Declarations: \begin{tabular}{ |c| }
+	\hline
+	PC \\
+	\hline
+	1 \\
+	\hline
+	
+\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c| }
+		\hline
+		PC \\
+		\hline
+		4 \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c| }
+		\hline
+		ICounter \\
+		\hline
+		\begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c|c| }
+		\hline
+		PC & this \\
+		\hline
+		7 & Counter \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c|c|c| }
+		\hline
+		PC & diff & this \\
+		\hline
+		9 & int & Counter \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c| }
+		\hline
+		PC \\
+		\hline
+		13 \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c|c| }
+		\hline
+		PC & c \\
+		\hline
+		14 & Counter \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c|>{\columncolor[gray]{0.8}}c|c|c|c|c| }
+		\hline
+		c & & PC & ret & $arg_1$ & this \\
+		\hline
+		Counter & & 14 & null & int & Counter \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c|>{\columncolor[gray]{0.8}}c|c|c|c|c| }
+		\hline
+		c & & PC & ret & $arg_1$ & this \\
+		\hline
+		Counter & & 14 & void & int & Counter \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+
+\item Declarations: \begin{tabular}{ |c|c| }
+		\hline
+		PC & c \\
+		\hline
+		15 & Counter \\
+		\hline
+		
+	\end{tabular}
+	\\Classes: \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+		\hline
+		Counter & ICounter \\
+		\hline
+		\begin{tabular}{c} Counter=Counter $\rightarrow$ Counter \\Incr=(Counter$\times$int) $\rightarrow$ void \\cnt=int \end{tabular} & \begin{tabular}{c} Incr=int $\rightarrow$ void \end{tabular} \\
+		\hline
+		
+	\end{tabular}
+	
+	\end{enumerate}
+}
+
+\textbf{Points:} \textit{4 (50\% of total).}
+
+\textbf{Grading:} \textit{Full points for more than 90\% of correct names and types. Three points if at least all names are correctly placed on the declarations and classes, with at least half the types correct. Half points for more than 40\% of correct names and types. Zero points otherwise.}
+
+\textbf{Associated learning objective:} \glsfirst{type}
+
 \ \\
-
-\textbf{Points:} \textit{25\%.}
-
-\ \\
-
-\textbf{Grading:} \textit{}
-
-\ \\
-
-\textbf{Associated learning objective:} \texttt{TYP}
-
-\ \\
-
-\paragraph{Question 4: } \ \\
-
-\textbf{Concrete example of question:} \textit{}
-
-\ \\
-
-\textbf{Concrete example of answer:} \textit{}
-
-\ \\
-
-\textbf{Points:} \textit{25\%.}
-
-\ \\
-
-\textbf{Grading:} \textit{}
-
-\ \\
-
-\textbf{Associated learning objective:} \texttt{BHF}
-
-\ \\
-
