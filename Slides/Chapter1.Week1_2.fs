@@ -544,7 +544,7 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           classDef "MyClass" 
             [
-              typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makeStatic |> makePublic 
+              typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
             ])
     ]
 
@@ -554,7 +554,7 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           ((classDef "MyClass" 
               [
-                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makeStatic |> makePublic 
+                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
               ])) >>
            ((dots >>
              (staticMethodCall "Console" "WriteLine" [staticMethodCall "MyClass" "f" [ConstInt(10)]])) >> endProgram))
@@ -585,7 +585,7 @@ let slides =
       CSharpCodeBlock(TextSize.Tiny,
           ((classDef "Program" 
               [
-                typedDef "main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makeStatic |> makePublic 
+                typedDef "main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
               ])))
 
       Pause
@@ -595,7 +595,7 @@ let slides =
     CSharpStateTrace(TextSize.Tiny,
         ((classDef "Program" 
             [
-              typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makeStatic |> makePublic
+              typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
             ] >> mainCall)),
         RuntimeState<_>.Zero (constInt 1))
 
