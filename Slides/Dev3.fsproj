@@ -60,8 +60,8 @@
     <Compile Include="Chapter1.Week3.fs" />
     <Compile Include="StateTraceSamples.fs" />
     <Compile Include="Program.fs" />
-    <None Include="dev3_week1_2.pdf" />
-    <None Include="dev3_week3.pdf" />
+    <None Include="INFDEV02_3_Lec1_OO_intro.pdf" />
+    <None Include="INFDEV02_3_Lec2_Static_typing.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
