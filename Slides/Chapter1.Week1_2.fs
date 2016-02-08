@@ -283,10 +283,10 @@ let slides =
       TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
-        (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(call "Console.ReadLine" [])])) >>
+        (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
         (ifelse (var "x" .> constInt 0) 
-          (call "Console.WriteLine" [constString "greater"])
-          (call "Console.WriteLine" [constString "smaller or equal"])))
+          (staticMethodCall "Console" "WriteLine" [constString "greater"])
+          (staticMethodCall "Console" "WriteLine" [constString "smaller or equal"])))
     ]
 
     TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
@@ -311,7 +311,7 @@ let slides =
       TextBlock @"The above Python becomes, in C\#:"
 
       CSharpCodeBlock(TextSize.Tiny,
-        (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(call "Console.ReadLine" [])])) >>
+        (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
          ((typedDeclAndInit "cnt" "int" (constInt 0)) >>
           (whiledo (var "x" .> constInt 0) 
             (("cnt" := (var "cnt" .+ constInt 1)) >>
@@ -395,7 +395,7 @@ let slides =
                 typedDef "C" [] "" (("a" := constInt 0) >> ("b" := constInt 0)) |> makePublic
               ])) >>
             (dots >>
-             call "Console.WriteLine" [var "x.a"]))
+             staticMethodCall "Console" "WriteLine" [var "x.a"]))
 
       Question @"In what sense \textit{invalid}?"
 
@@ -415,7 +415,7 @@ let slides =
                 typedDef "C" [] "" (("a" := constInt 0) >> ("b" := constInt 0)) |> makePublic
               ])) >>
             (dots >>
-             call "Console.WriteLine" [var "x.b"]))
+             staticMethodCall "Console" "WriteLine" [var "x.b"]))
 
       TextBlock @"This suggests that Python is like Java/C\# where all class attributes are automatically declared as \texttt{public}."
     ]
@@ -565,7 +565,7 @@ let slides =
     CSharpStateTrace(TextSize.Tiny,
           (classDef "MyClass" 
               [
-                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10))))  |> makeStatic |> makePublic
+                typedDef "f" ["int","x"] "int" ((ret (var "x" .+ ConstInt(10)))) |> makePublic |> makeStatic
               ]) >>
            ((dots >>
              (staticMethodCall "Console" "WriteLine" [staticMethodCall "MyClass" "f" [ConstInt(10)]])) >> endProgram),
@@ -595,7 +595,7 @@ let slides =
     CSharpStateTrace(TextSize.Tiny,
         ((classDef "Program" 
             [
-              typedDef "main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makeStatic |> makePublic
+              typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makeStatic |> makePublic
             ] >> mainCall)),
         RuntimeState<_>.Zero (constInt 1))
 

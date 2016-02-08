@@ -1,27 +1,29 @@
-﻿﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{86CACB78-7AE5-4626-8AEA-917CEF11C02A}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ac821330-cafb-4e9a-92bc-ed6e89c508da}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SlidesGenerator</RootNamespace>
-    <AssemblyName>SlidesGenerator</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <RootNamespace>DEV3_slides</RootNamespace>
+    <AssemblyName>DEV3_slides</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
-    <Name>SlidesGenerator</Name>
+    <Name>DEV3_slides</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\SlidesGenerator.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\DEV3_slides.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,42 +34,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Release\SlidesGenerator.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\DEV3_slides.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="FSharp.Core">
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Coroutine.fs" />
-    <Compile Include="CommonLatex.fs" />
-    <Compile Include="Runtime.fs" />
-    <Compile Include="CodeDefinitionImperative.fs" />
-    <Compile Include="CodeDefinitionLambda.fs" />
-    <Compile Include="Interpreter.fs" />
-    <Compile Include="SlideDefinition.fs" />
-    <Compile Include="StateTraceSamples.fs" />
-    <Compile Include="Chapter1.Week1.fs" />
-    <Compile Include="Chapter1.Week2.fs" />
-    <Compile Include="Working together as teachers.fs" />
-    <Compile Include="FunctionalWeek1.fs" />
-    <Compile Include="Program.fs" />
-    <None Include="App.config" />
-    <None Include="beamerthemeHRTheme.sty">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="logoHRBig.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -84,6 +53,32 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
+  <ItemGroup>
+    <None Include="App.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Chapter1.Week1_2.fs" />
+    <Compile Include="Chapter1.Week3.fs" />
+    <Compile Include="StateTraceSamples.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="dev3_week1_2.pdf" />
+    <None Include="dev3_week3.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\LatexSlideGenerator\Slides\LatexSlidesGenerator.fsproj">
+      <Name>LatexSlidesGenerator</Name>
+      <Project>{86cacb78-7ae5-4626-8aea-917cef11c02a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
