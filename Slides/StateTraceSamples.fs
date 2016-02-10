@@ -9,40 +9,40 @@ open TypeChecker
 
 let slides = 
   [
-    CSharpStateTrace(TextSize.Tiny,
-          ((interfaceDef "ICounter" 
-              [
-                typedSig "Incr" ["int","diff"] "void"
-              ]) >>
-           ((classDef "Counter" 
-              [
-                implements "ICounter"
-                typedDecl "cnt" "int" |> makePrivate
-                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
-                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
-              ]) >>
-            (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
-               (methodCall "c" "Incr" [ConstInt 5])) >> 
-                endProgram))),
-          Runtime.RuntimeState<_>.Zero (constInt 1))
-
-    CSharpTypeTrace(TextSize.Tiny,
-          ((interfaceDef "ICounter" 
-              [
-                typedSig "Incr" ["int","diff"] "void"
-              ]) >>
-           ((classDef "Counter" 
-              [
-                implements "ICounter"
-                typedDecl "cnt" "int" |> makePrivate
-                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
-                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
-              ]) >>
-            (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
-               (methodCall "c" "Incr" [ConstInt 5])) >> 
-                endProgram))),
-          TypeCheckingState.Zero)
-
+//    CSharpStateTrace(TextSize.Tiny,
+//          ((interfaceDef "ICounter" 
+//              [
+//                typedSig "Incr" ["int","diff"] "void"
+//              ]) >>
+//           ((classDef "Counter" 
+//              [
+//                implements "ICounter"
+//                typedDecl "cnt" "int" |> makePrivate
+//                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
+//                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
+//              ]) >>
+//            (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
+//               (methodCall "c" "Incr" [ConstInt 5])) >> 
+//                endProgram))),
+//          Runtime.RuntimeState<_>.Zero (constInt 1))
+//
+//    CSharpTypeTrace(TextSize.Tiny,
+//          ((interfaceDef "ICounter" 
+//              [
+//                typedSig "Incr" ["int","diff"] "void"
+//              ]) >>
+//           ((classDef "Counter" 
+//              [
+//                implements "ICounter"
+//                typedDecl "cnt" "int" |> makePrivate
+//                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
+//                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
+//              ]) >>
+//            (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
+//               (methodCall "c" "Incr" [ConstInt 5])) >> 
+//                endProgram))),
+//          TypeCheckingState.Zero)
+//
 //    CSharpTypeTrace(TextSize.Tiny,
 //        (
 //           ((dots >>

@@ -516,16 +516,6 @@ let slides =
           }
         ]])
 
-    CSharpTypeTrace(TextSize.Tiny,
-        ((classDef "Counter" 
-            [
-              typedDecl "cnt" "int" |> makePrivate
-              typedDef "Counter" [] "" (("this.cnt" := constInt 0) >> endProgram) |> makePublic
-              typedDef "incr" ["int","diff"] "int" ((("this.cnt" := (var "this.cnt" .+ var "diff")) >> (ret (var "this.cnt"))) >> endProgram) |> makePublic
-            ]) >>
-          endProgram),
-        TypeCheckingState<Code>.Zero)
-
     Advanced(
       VerticalStack[
         ItemsBlock[
@@ -568,7 +558,15 @@ let slides =
           }
         ]])
 
-    // TODO: sample
+    CSharpTypeTrace(TextSize.Tiny,
+        ((classDef "Counter" 
+            [
+              typedDecl "cnt" "int" |> makePrivate
+              typedDef "Counter" [] "" (("this.cnt" := constInt 0) >> endProgram) |> makePublic
+              typedDef "incr" ["int","diff"] "int" ((("this.cnt" := (var "this.cnt" .+ var "diff")) >> (ret (var "this.cnt"))) >> endProgram) |> makePublic
+            ]) >>
+          endProgram),
+        TypeCheckingState<Code>.Zero)
 
     Advanced(
       VerticalStack[
@@ -589,7 +587,16 @@ let slides =
           }
         ]])
 
-    // TODO: sample
+    CSharpTypeTrace(TextSize.Tiny,
+        ((classDef "Counter" 
+            [
+              typedDecl "cnt" "int" |> makePublic
+              typedDef "Counter" [] "" (("this.cnt" := constInt 0) >> endProgram) |> makePublic
+            ]) >>
+              (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
+                 (typedDeclAndInit "x" "int" (var"c.cnt"))) >> 
+                  endProgram)),
+        TypeCheckingState<Code>.Zero)
 
     Advanced(
       VerticalStack[
@@ -611,7 +618,17 @@ let slides =
           }
         ]])
 
-    // TODO: sample
+    CSharpTypeTrace(TextSize.Tiny,
+          (((classDef "Counter" 
+              [
+                typedDecl "cnt" "int" |> makePrivate
+                typedDef "Counter" [] "" ("this.cnt" := constInt 0) |> makePublic
+                typedDef "Incr" ["int","diff"] "void" ("this.cnt" := (var "this.cnt" .+ var "diff")) |> makePublic
+              ]) >>
+            (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
+               (methodCall "c" "Incr" [ConstInt 5])) >> 
+                endProgram))),
+          TypeCheckingState.Zero)
 
     Advanced(
       VerticalStack[
@@ -633,24 +650,37 @@ let slides =
           }
         ]])
 
+    CSharpTypeTrace(TextSize.Tiny,
+        ((classDef "Utils" 
+            [
+              typedDef "AddThree" ["int","a";"int","b";"int","c"] "int" (ret(var"a" .+ var"b" .+ var"c")) |> makePublic |> makeStatic
+            ]) >>
+              (((typedDeclAndInit "x" "int" (staticMethodCall "Utils" "AddThree" [constInt 10; constInt 20; constInt 30]))) >> 
+                  endProgram)),
+        TypeCheckingState<Code>.Zero)
+
     ItemsBlock[
         ! @"The constructor of a class is simply a specially named static method"
         ! @"It has no further typing rules"
       ]
 
-    // TODO: sample
+    CSharpTypeTrace(TextSize.Tiny,
+        ((classDef "CounterFrom" 
+            [
+              typedDecl "cnt" "int" |> makePublic
+              typedDef "CounterFrom" ["int","cnt0"] "" (("this.cnt" := var"cnt0") >> endProgram) |> makePublic
+            ]) >>
+              ((typedDeclAndInit "c" "CounterFrom" (newC "CounterFrom" [ConstInt 100])) >>
+                  endProgram)),
+        TypeCheckingState<Code>.Zero)
 
     Section("Conclusion")
     SubSection("Looking back")
     ItemsBlock
       [
-        !"Issues with Python"
-        !"Static typing as a way to run a coarse simulation of the program"
+        !"Python is brittle and breaks easily"
+        !"Static typing is a way to run a coarse simulation of the program"
+        !"If type checking fails, then the program cannot be guaranteed to run correctly, and we get a compiler error"
+        !"Safer programming, but at the cost of being able to run less programs that might still be valid"
       ]
   ]
-
-//TODO: examples of code after every type derivation with execution of the type checker with declarations stack
-//TODO: methodCall should take arbitrary expression, not variable names
-//TODO: overloading
-//TODO: arrays as primitive data types
-//TODO: lambda's
