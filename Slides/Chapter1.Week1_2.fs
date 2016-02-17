@@ -294,8 +294,8 @@ let slides =
     CSharpStateTrace(TextSize.Tiny,
         ((typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
          ((ifelse (var "x" .> constInt 0) 
-             (staticMethodCall "Console" "WriteLine" [constString "greater"])
-             (staticMethodCall "Console" "WriteLine" [constString "smaller or equal"])))),
+             ((staticMethodCall "Console" "WriteLine" [constString "greater"]) >> endProgram)
+             ((staticMethodCall "Console" "WriteLine" [constString "smaller or equal"]) >> endProgram)))),
         RuntimeState<_>.WithInput (constInt 1) ["100"])
 
     VerticalStack[
@@ -325,8 +325,8 @@ let slides =
            ((typedDeclAndInit "cnt" "int" (constInt 0)) >>
             (whiledo (var "x" .> constInt 1) 
               (("cnt" := (var "cnt" .+ constInt 1)) >>
-               ("x" := (var "x" ./ constInt 2)))))) >> 
-            staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram),
+               (("x" := (var "x" ./ constInt 2))) >> endProgram)))) >> 
+            (staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram)),
         RuntimeState<_>.WithInput (constInt 1) ["32"])
 
     SubSection "Part I"
