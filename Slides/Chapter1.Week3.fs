@@ -30,7 +30,7 @@ let slides =
     SubSection "Broken code examples"
     VerticalStack[
       Question "What is wrong with this?"
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Small,
           def "f" ["x"] (ret (var "x" .* constInt 2)) >>
           call "f" [constString "nonsense"])
       Pause
@@ -39,7 +39,7 @@ let slides =
 
     VerticalStack[
       Question "What is wrong with this?"
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Small,
          ("x" := (call "input" []) >>
           ifelse (var "x" .> constInt 100) 
                  (call "print" [constString "dumb"])
@@ -50,7 +50,7 @@ let slides =
 
     VerticalStack[
       Question "What is wrong with this?"
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Small,
          (def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
           call "g" [constInt -1]))
       Pause
@@ -71,7 +71,7 @@ let slides =
 
     VerticalStack[
       Question @"How many times would we need to test to be sure there is no error?"
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Small,
          (ifelse (call "randint" [constInt 0; constInt 100000] .> constInt 99999)
                  (call "g" [constInt -1])
                  (call "g" [var "mercedesSL500"])))
@@ -83,7 +83,7 @@ let slides =
       [
         ! "We want our programming languages to perform checks for us"
         ! "Clearly nonsensical programs should be rejected before we can even run them"
-        ! @"It is safer and easier to spend more time ""talking"" with the IDE than hoping to find all errors at runtime"
+        ! @"It is safer and easier to spend more time ``talking'' with the IDE than hoping to find all errors with tests"
       ]
 
     Section "Static typing"
@@ -123,10 +123,10 @@ let slides =
       ]
 
     VerticalStack[
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Small,
           (def "f" ["x"] (ret (var "x" .* constInt 2))))
       TextBlock "Becomes, typed:"
-      CSharpCodeBlock(TextSize.Normal,
+      CSharpCodeBlock(TextSize.Small,
           (typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2)))) |> Unrepeated
       Question @"What has improved and why?"
       Pause
@@ -135,7 +135,7 @@ let slides =
 
     VerticalStack[
       Question @"Is this still possible to write (as it was in Python)?"
-      CSharpCodeBlock(TextSize.Normal,
+      CSharpCodeBlock(TextSize.Small,
          (typedDef "f" ["int", "x"] "int" (ret (var "x" .* constInt 2)) >>
           call "f" [constString "nonsense"])) |> Unrepeated
       Pause
@@ -143,29 +143,28 @@ let slides =
       ]
 
     VerticalStack[
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Tiny,
          ("x" := (call "input" []) >>
           ifelse (var "x" .> constInt 100) 
                  (call "print" [constString "dumb"])
                  (call "print" [constString "dumber"])))
       TextBlock "Becomes, typed:"
-      CSharpCodeBlock(TextSize.Normal,
-         (typedDecl "x" "int" >>
-          (("x" := (call "Int32.Parse" [(call "Console.ReadLine" [])])) >>
-           ifelse (var "x" .> constInt 100) 
+      CSharpCodeBlock(TextSize.Tiny,
+         (typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
+          (ifelse (var "x" .> constInt 100) 
                   (call "Console.WriteLine" [constString "safe"])
-                  (call "Console.WriteLine" [constString "safer"])))) |> Unrepeated
+                  (call "Console.WriteLine" [constString "safer"]))) |> Unrepeated
       Question @"What has improved and why?"
       Pause
       TextBlock "The variable declaration specifies what is allowed (and what is not) inside the variable."
       ]
 
     VerticalStack[
-      PythonCodeBlock(TextSize.Normal,
+      PythonCodeBlock(TextSize.Small,
          (def "g" ["car"] (ret (methodCall "car" "drive" [constInt 2])) >>
           call "g" [constInt -1]))
       TextBlock "Becomes, typed:"
-      CSharpCodeBlock(TextSize.Normal,
+      CSharpCodeBlock(TextSize.Small,
          (typedDef "g" ["Car","car"] "int" (ret (methodCall "car" "drive" [constInt 2])) >>
           call "g" [constInt -1])) |> Unrepeated
       Question @"What has improved and why?"
