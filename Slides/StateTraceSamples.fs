@@ -84,16 +84,16 @@ let slides =
 //               endProgram)),
 //          Runtime.RuntimeState<_>.Zero (constInt 1))
 //
-//    PythonStateTrace(TextSize.Tiny,
-//          ((classDef "Counter" 
-//              [
-//                def "__init__" ["self"] ("self.cnt" := constInt 0)
-//                def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
-//              ]) >>
-//            ((("c" := newC "Counter" []) >>
-//              (methodCall "c" "incr" [ConstInt 5])) >>
-//              endProgram)),
-//          Runtime.RuntimeState<_>.Zero (constInt 1))
+    PythonStateTrace(TextSize.Tiny,
+          ((classDef "Counter" 
+              [
+                def "__init__" ["self"] ("self.cnt" := constInt 0)
+                def "incr" ["self"; "diff"] ("self.cnt" := (var "self.cnt" .+ var "diff"))
+              ]) >>
+            ((("c" := newC "Counter" []) >>
+              (methodCall "c" "incr" [ConstInt 5])) >>
+              endProgram)),
+          Runtime.RuntimeState<_>.Zero (constInt 1))
 //
 //
 //    PythonStateTrace(TextSize.Tiny,

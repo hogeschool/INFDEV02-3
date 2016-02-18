@@ -174,7 +174,7 @@ let slides =
     TextBlock @"This snippet (remember: we cannot just copy and paste it) produces the same execution in both Python and Java/C\#!"
 
     CSharpStateTrace(TextSize.Tiny,
-        (typedDeclAndInit "x" "int" (constInt 10 .+ constInt 20) >> endProgram),
+        ((typedDeclAndInit "x" "int" (constInt 10 .+ constInt 20)) >> endProgram),
         RuntimeState<_>.Zero (constInt 1))
 
 
@@ -295,7 +295,7 @@ let slides =
         ((typedDeclAndInit "x" "int" (staticMethodCall "Int32" "Parse" [(staticMethodCall "Console" "ReadLine" [])])) >>
          ((ifelse (var "x" .> constInt 0) 
              ((staticMethodCall "Console" "WriteLine" [constString "greater"]) >> endProgram)
-             ((staticMethodCall "Console" "WriteLine" [constString "smaller or equal"]) >> endProgram)))),
+             ((staticMethodCall "Console" "WriteLine" [constString "smaller or equal"]) >> endProgram)))) >> endProgram,
         RuntimeState<_>.WithInput (constInt 1) ["100"])
 
     VerticalStack[
@@ -326,7 +326,7 @@ let slides =
             (whiledo (var "x" .> constInt 1) 
               (("cnt" := (var "cnt" .+ constInt 1)) >>
                (("x" := (var "x" ./ constInt 2))) >> endProgram)))) >> 
-            (staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram)),
+            ((staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram))) >> endProgram,
         RuntimeState<_>.WithInput (constInt 1) ["32"])
 
     SubSection "Part I"
