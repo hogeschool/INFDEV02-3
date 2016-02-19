@@ -56,6 +56,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Dev2.SampleExams.fs" />
     <Compile Include="Chapter1.Week1_2.fs" />
     <Compile Include="Chapter1.Week3.fs" />
     <Compile Include="Chapter2.Week4.fs" />

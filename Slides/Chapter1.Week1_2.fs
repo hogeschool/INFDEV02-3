@@ -1,7 +1,7 @@
 ﻿module Chapter1.Week1_2
 
 open CommonLatex
-open SlideDefinition
+open LatexDefinition
 open CodeDefinitionImperative
 open Interpreter
 open Runtime
@@ -610,4 +610,3 @@ let slides =
       ]
   ]
 
-// arrays

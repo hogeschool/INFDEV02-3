@@ -1,7 +1,7 @@
 ﻿module Chapter2.Week4
 
 open CommonLatex
-open SlideDefinition
+open LatexDefinition
 open CodeDefinitionImperative
 open Interpreter
 open Runtime

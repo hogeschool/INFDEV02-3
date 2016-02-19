@@ -1,7 +1,7 @@
 ﻿module StateTraceSamples
 
 open CommonLatex
-open SlideDefinition
+open LatexDefinition
 open CodeDefinitionImperative
 open Interpreter
 open Runtime
