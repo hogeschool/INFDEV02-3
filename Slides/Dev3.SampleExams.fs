@@ -73,5 +73,5 @@ let exam1 =
                   (((typedDeclAndInit "myA" "A" (newC "C" [])) >>
                      (staticMethodCall "Console" "WriteLine" [methodCall "myA" "M" [ConstInt 5]])) >> 
                       endProgram))))),
-          TypeCheckingState.Zero)
+          TypeCheckingState.Zero, false)
   ]

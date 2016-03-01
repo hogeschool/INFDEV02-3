@@ -252,7 +252,7 @@ let slides =
 
     CSharpTypeTrace(TextSize.Tiny,
         ((typedDeclAndInit "x" "int" (ConstInt 10)) >> endProgram),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -272,7 +272,7 @@ let slides =
     CSharpTypeTrace(TextSize.Tiny,
         (((typedDeclAndInit "x" "int" (ConstInt 10))) >>
            ("x" := (var"x" .+ (ConstInt 5))) >> endProgram),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -404,7 +404,7 @@ let slides =
         ((typedDeclAndInit "x" "int" (ConstInt 10)) >>
          ((typedDeclAndInit "y" "int" (ConstInt 20)) >>
            ("x" := (var"x" .+ var"y")) >> endProgram)),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -432,7 +432,7 @@ let slides =
            (ifelse (var"x" .> var"y") 
                    ((typedDeclAndInit "z" "string" (ConstString "x")) >> staticMethodCall "Console" "WriteLine" [var "z"]) 
                    ((typedDeclAndInit "z" "string" (ConstString "y")) >> staticMethodCall "Console" "WriteLine" [var "z"])) >> endProgram)),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -496,7 +496,7 @@ let slides =
               typedDef "incr" ["int","diff"] "void" (("this.cnt" := (var "this.cnt" .+ var "diff")) >> endProgram) |> makePublic
             ]) >>
           endProgram),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -565,7 +565,7 @@ let slides =
               typedDef "incr" ["int","diff"] "int" ((("this.cnt" := (var "this.cnt" .+ var "diff")) >> (ret (var "this.cnt"))) >> endProgram) |> makePublic
             ]) >>
           endProgram),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -595,7 +595,7 @@ let slides =
               (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
                  (typedDeclAndInit "x" "int" (var"c.cnt"))) >> 
                   endProgram)),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -627,7 +627,7 @@ let slides =
             (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
                (methodCall "c" "Incr" [ConstInt 5])) >> 
                 endProgram))),
-          TypeCheckingState.Zero)
+          TypeCheckingState.Zero, true)
 
     Advanced(
       VerticalStack[
@@ -656,7 +656,7 @@ let slides =
             ]) >>
               (((typedDeclAndInit "x" "int" (staticMethodCall "Utils" "AddThree" [constInt 10; constInt 20; constInt 30]))) >> 
                   endProgram)),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     ItemsBlock[
         ! @"The constructor of a class is simply a specially named static method"
@@ -671,7 +671,7 @@ let slides =
             ]) >>
               ((typedDeclAndInit "c" "CounterFrom" (newC "CounterFrom" [ConstInt 100])) >>
                   endProgram)),
-        TypeCheckingState<Code>.Zero)
+        TypeCheckingState<Code>.Zero, true)
 
     Section("Conclusion")
     SubSection("Looking back")
