@@ -106,7 +106,7 @@ let slides =
     ItemsBlock
       [
         ! "Especially in mainstream languages, the specification of the type of a variable is done by hand by the programmer"
-        ! "In other languages (mostly functional languages like F\#, Haskell, etc.) the type of variables is automatically guessed by the compiler"
+        ! "In other languages (mostly functional languages like F\#, Haskell, etc.) the type of variables is automatically 'guessed' by the compiler"
         ! "In our case our programs will become a bit more verbose but better specified"
         ! "Still, static typing is not necessarily connected with verbosity"
       ]
@@ -215,7 +215,7 @@ let slides =
         ]
         Question "How do we read this rule?"
         Pause
-        TextBlock @"If I have my umbrella with me, and it is raining, then I open my umbrella" 
+        TextBlock @"If it is raining, and I have my umbrella with me, then I open my umbrella" 
         ])
 
     TextBlock "Let us apply this machinery to programming languages"
@@ -251,7 +251,7 @@ let slides =
         ]])
 
     CSharpTypeTrace(TextSize.Tiny,
-        ((typedDeclAndInit "x" "int" (ConstInt 10)) >> endProgram),
+        ((typedDecl "x" "int") >> endProgram),
         TypeCheckingState<Code>.Zero, true)
 
     Advanced(
