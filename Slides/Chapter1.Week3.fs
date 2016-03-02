@@ -455,19 +455,19 @@ let slides =
     Advanced(
       VerticalStack[
         ItemsBlock[
-            ! @"The typing rule for a \texttt{class} declaration adds the class declaration to the declarations with all its fields and methods"
+            ! @"The typing rule for a \texttt{class} declaration adds the class declaration to the declarations with all its attributes and methods"
             ! @"When adding the declaration of the class, we have to check that the types of the method bodies match their declarations"
-            ! @"Assume that \texttt{C} is the class name, $f_i$ is the i-th field in the class (of type $F_i$), and \texttt{m}$_j$ is the j-th method in the class (with type $M_j$)"
+            ! @"Assume that \texttt{C} is the class name, $a_i$ is the i-th attribute in the class (of type $A_i$), and \texttt{m}$_j$ is the j-th method in the class (with type $M_j$)"
           ]
 
         Tiny
 
         TypingRules[
           {
-            Premises = [@"D_1 := D[C \mapsto [..\ f_i \mapsto F_i\ ..\ m_j \mapsto M_j\ ..]] "
-                        @"\langle \mathtt{M_j\ m_j}, D_1[\mathtt{this} \mapsto C] \rangle \rightarrow \langle M^1_j, D_2 \rangle"
-                        @"M_j = M^1_j"]
-            Conclusion = @"\langle (\mathtt{class\ C\ \{\ ..F_i\ f_i..\ \ ..M_j\ m_j..\ \}}), D \rangle \rightarrow \langle \mathtt{T}, D_1 \rangle"
+            Premises = [@"D_1 := D[C \mapsto [...,a_i \mapsto A_i,...,m_j \mapsto M_j,...]] "
+                        @"\langle \mathtt{M_j\ m_j}, D_1[\mathtt{this} \mapsto C] \rangle \rightarrow \langle {M^'}_j, D_2 \rangle"
+                        @"M_j = {M^'}_j"]
+            Conclusion = @"\langle (\mathtt{class\ C\ \{...,A_i\ a_i,...,M_j\ m_j,...\}}), D \rangle \rightarrow \langle \mathtt{T}, D_1 \rangle"
           }
         ]])
 
@@ -476,15 +476,15 @@ let slides =
         ItemsBlock[
             ! @"When type checking a \texttt{method} declaration (within a class declaration} we type check its body and compare the result with the type of the declaration"
             ! @"Assume that \texttt{C} is the class name, $p_i$ is the i-th parameter of the method (of type $P_i$), and \texttt{b} is the method body"
-            ! @"The type of a method is of the form $P_1 \times P_2 \times \dots \times P_n \rightarrow R$, where $P_l$ is the type of the l-th parameter and $R$ is the return type"
+            ! @"The type of a method is of the form $P_1 \times P_2 \times \dots \times P_n \rightarrow R$, where $P_i$ is the type of the i-th parameter and $R$ is the return type"
           ]
 
         Tiny
 
         TypingRules[
           {
-            Premises = [@"\langle (\mathtt{b}), D[..p_l \mapsto P_l..] \rangle \rightarrow \langle \mathtt{R}, D_1 \rangle"]
-            Conclusion = @"\langle (\mathtt{R\ m(..P_l\ p_l..)b}), D \rangle \rightarrow \langle (P_1 \times P_2 \times \dots \times P_n \rightarrow R), D \rangle"
+            Premises = [@"\langle (\mathtt{b}), D[...,p_i \mapsto P_i,...] \rangle \rightarrow \langle \mathtt{R}, D_1 \rangle"]
+            Conclusion = @"\langle (\mathtt{R\ m(...,P_i\ p_i,...)b}), D \rangle \rightarrow \langle (P_1 \times P_2 \times \dots \times P_n \rightarrow R), D \rangle"
           }
         ]])
 
@@ -570,8 +570,8 @@ let slides =
     Advanced(
       VerticalStack[
         ItemsBlock[
-            ! @"Sometimes we may look a field $f$ up from an instance $x$ of a class"
-            ! @"This assumes the type of the field, which needs to be looked up in the class descriptor found in the declarations"
+            ! @"Sometimes we may look a attribute $a$ up from an instance $c$ of a class"
+            ! @"This assumes the type of the attribute, which needs to be looked up in the class descriptor found in the declarations"
             ! @"No declaration is further modified"
           ]
 
@@ -579,10 +579,10 @@ let slides =
 
         TypingRules[
           {
-            Premises = [@"\langle \mathtt{x}, D \rangle \rightarrow \langle \mathtt{C}, D \rangle"
-                        @"\langle \mathtt{f}, C \rangle \rightarrow \langle \mathtt{F}, C \rangle"
+            Premises = [@"\langle \mathtt{c}, D \rangle \rightarrow \langle \mathtt{C}, D \rangle"
+                        @"\langle \mathtt{a}, C \rangle \rightarrow \langle \mathtt{A}, C \rangle"
                         @"T = U"]
-            Conclusion = @"\langle (\mathtt{x.f}), D \rangle \rightarrow \langle \mathtt{F}, D \rangle"
+            Conclusion = @"\langle (\mathtt{c.a}), D \rangle \rightarrow \langle \mathtt{A}, D \rangle"
           }
         ]])
 
@@ -592,15 +592,15 @@ let slides =
               typedDecl "cnt" "int" |> makePublic
               typedDef "Counter" [] "" (("this.cnt" := constInt 0) >> endProgram) |> makePublic
             ]) >>
-              (((typedDeclAndInit "c" "ICounter" (newC "Counter" [])) >>
-                 (typedDeclAndInit "x" "int" (var"c.cnt"))) >> 
+              (((typedDeclAndInit "c" "Counter" (newC "Counter" [])) >>
+                 (typedDeclAndInit "a" "int" (var"c.cnt"))) >> 
                   endProgram)),
         TypeCheckingState<Code>.Zero, true)
 
     Advanced(
       VerticalStack[
         ItemsBlock[
-            ! @"Sometimes we may call a method $m$ up from an instance $x$ of a class and with parameters $p_i$"
+            ! @"Sometimes we may call a method $m$ up from an instance $c$ of a class and with parameters $p_i$"
             ! @"This assumes the return type of the method, provided that all parameter types match the types expected by the method"
             ! @"No declaration is further modified"
           ]
@@ -609,11 +609,11 @@ let slides =
 
         TypingRules[
           {
-            Premises = [@"\langle \mathtt{x}, D \rangle \rightarrow \langle \mathtt{C}, D \rangle"
+            Premises = [@"\langle \mathtt{c}, D \rangle \rightarrow \langle \mathtt{C}, D \rangle"
                         @"\langle \mathtt{m}, C \rangle \rightarrow \langle (\mathtt{P}_1 \times \mathtt{P}_2 \times \dots \times \mathtt{P}_n \rightarrow \mathtt{R}), C \rangle"
                         @"\langle \mathtt{p_i}, D \rangle \rightarrow \langle \mathtt{P}'_i, D \rangle"
                         @"\mathtt{P}_i = \mathtt{P}'_i"]
-            Conclusion = @"\langle (\mathtt{x.f(..p_i..)}), D \rangle \rightarrow \langle \mathtt{R}, D \rangle"
+            Conclusion = @"\langle (\mathtt{c.m(..p_i..)}), D \rangle \rightarrow \langle \mathtt{R}, D \rangle"
           }
         ]])
 
