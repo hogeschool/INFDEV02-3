@@ -329,6 +329,10 @@ let slides =
             ((staticMethodCall "Console" "WriteLine" [(constString "Result is ") .+ (toString (var "cnt"))]) >> endProgram))) >> endProgram,
         RuntimeState<_>.WithInput (constInt 1) ["32"])
 
+    Section "Live coding demo: let's see these languages in action."
+    SubSection "Part I"
+    TextBlock @"End of part I (see you next week)"
+
     SubSection "Part I"
     TextBlock @"End of part I"
 
@@ -598,6 +602,8 @@ let slides =
               typedDef "Main" ["String[]","args"] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Hello world!"]) |> makePublic |> makeStatic
             ] >> mainCall)),
         RuntimeState<_>.Zero (constInt 1))
+
+    Section "Live coding demo: let's see these languages in action."
 
     Section("Conclusion")
     SubSection("What have we seen so far?")
