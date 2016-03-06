@@ -1,4 +1,4 @@
-﻿module Chapter1.Week3
+﻿module Chapter2.Week3
 
 open CommonLatex
 open LatexDefinition
