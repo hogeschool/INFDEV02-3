@@ -257,6 +257,27 @@ let slides =
     Advanced(
       VerticalStack[
         ItemsBlock[
+            ! @"When we assign an expression to a variable, the type of the variable found in the declarations and the type of the variable must match"
+            ! @"This does further nothing to the declarations"
+            ! @"Assignment does not take any type: it is \texttt{void}"
+            ! @"Let's assume that \texttt{x} is a variable name"
+          ]
+
+        TypingRules[
+          {
+            Premises = [ @"\langle \mathtt{e}, D \rangle \rightarrow \langle T, D \rangle"; @"T = D[x]" ]
+            Conclusion = @"\langle \mathtt{x = e}, D \rangle \rightarrow \langle D[\mathtt{void}], D \rangle"
+          }
+        ]])
+
+    CSharpTypeTrace(TextSize.Tiny,
+        (((typedDecl "x" "int") >>
+           ("x" := ConstInt 5)) >> endProgram),
+        TypeCheckingState<Code>.Zero, true)
+
+    Advanced(
+      VerticalStack[
+        ItemsBlock[
             ! @"When we look the variable up, its type is whatever type was found connected to it in the declarations"
             ! @"This does further nothing to the declarations"
             ! @"Let's assume that \texttt{x} is a variable name"
@@ -571,7 +592,7 @@ let slides =
       VerticalStack[
         ItemsBlock[
             ! @"Sometimes we may look a attribute $a$ up from an instance $c$ of a class"
-            ! @"This assumes the type of the attribute, which needs to be looked up in the class descriptor found in the declarations"
+            ! @"This expression takes the type of the attribute, which needs to be looked up in the class descriptor found in the declarations"
             ! @"No declaration is further modified"
           ]
 
