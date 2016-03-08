@@ -7,6 +7,89 @@ open Interpreter
 open Runtime
 open TypeChecker
 
+let exam3 =
+  [
+    Section("Question 1")
+    TextBlock @"Given the following block of code, fill in the stack, heap, and PC with all the steps taken by the program at runtime."
+    ItemsBlock
+      [
+        ! @"Points: \textit{4 (50\% of total).}"
+        ! @"Grading: one point per correctly filled-in execution step."
+        ! @"Associated learning objective: \textit{abstraction}."
+      ]
+    CSharpStateTrace(TextSize.Small,
+          ((interfaceDef "MovableObject" []) >>
+             (((classDef "Car" 
+                  [
+                    implements "MovableObject"
+                    typedDeclAndInit "direction" "float" (ConstFloat(3.14)) |> makePrivate
+                    typedDef "Car" [] "" (endProgram) |> makePublic
+                    typedDef "move" [("Car", "car");("float","direction")] "void" ("car.direction" := var "direction") |> makePublic |> makeStatic
+                  ] >>
+                (classDef "Particle" 
+                  [
+                    implements "MovableObject"
+                    typedDeclAndInit "direction" "float" (ConstFloat(0.00)) |> makePrivate
+                    typedDef "Particle" [] "" (endProgram) |> makePublic
+                  ])) >>
+                (((typedDeclAndInit "mo" "MovableObject" (newC "Car" [])) >>
+                     (staticMethodCall "Car" "move" [ Var("mo");(ConstFloat(1.0))])) >> 
+                      endProgram)))),
+          Runtime.RuntimeState<_>.Zero (constInt 1))
+  ]
+
+let exam2 =
+  [
+    Section("Question 1")
+    TextBlock @"Given the following block of code, fill in the stack, heap, and PC with all the steps taken by the program at runtime."
+    ItemsBlock
+      [
+        ! @"Points: \textit{4 (50\% of total).}"
+        ! @"Grading: one point per correctly filled-in execution step."
+        ! @"Associated learning objective: \textit{abstraction}."
+      ]
+    CSharpStateTrace(TextSize.Small,
+          ((interfaceDef "Animal" 
+              [
+                typedSig "makeSound" [] "void"
+              ]) >>
+             ((((classDef "Dog" 
+                  [
+                    implements "Animal"
+                    typedDef "Dog" [] "" (endProgram) |> makePublic
+                    typedDef "makeSound" [] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Woof!"]) |> makePublic
+                  ]) >>
+                (classDef "Cat" 
+                  [
+                    implements "Animal"
+                    typedDef "Cat" [] "" (endProgram) |> makePublic
+                    typedDef "makeSound" [] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Miao!"]) |> makePublic
+                  ])) >>
+                (((typedDeclAndInit "myAnimal" "Animal" (newC "Cat" [])) >>
+                     (methodCall "myAnimal" "makeSound" [])) >> 
+                      endProgram)))),
+          Runtime.RuntimeState<_>.Zero (constInt 1))
+
+    CSharpTypeTrace(TextSize.Small,
+          (classDef "Employee" 
+                    [
+                      typedDeclAndInit "name" "string" (ConstFloat(3.14)) |> makePrivate
+                      typedDef "Employee" [] "" (endProgram) |> makePublic
+                      typedDef "GetName" [] "string" (ret (var"this.name") ) |> makePublic
+                    ] >>
+           classDef "Manager" 
+                    [
+                      extends "Employee"
+                      typedDef "Manager" [] "" (endProgram) |> makePublic
+                      typedDef "GetFunction" [] "string" (ret (ConstString "I am the boss!") ) |> makePublic
+                    ] >>
+           dots >> 
+           typedDeclAndInit "Employee" "employee" (newC "Manager" []) >>
+           endProgram),
+
+          TypeCheckingState.Zero, false)
+  ]
+
 let exam1 = 
   [
     Section("Question 1")
