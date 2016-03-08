@@ -36,6 +36,37 @@ let exam3 =
                      (staticMethodCall "Car" "move" [ Var("mo");(ConstFloat(1.0))])) >> 
                       endProgram)))),
           Runtime.RuntimeState<_>.Zero (constInt 1))
+    
+    Section("Question 2")
+    TextBlock @"Given the following block of code, fill in the declarations, class definitions, and PC with all steps taken by the compiler while type checking."
+
+    ItemsBlock
+      [
+        ! @"Points: \textit{4 (50\% of total).}"
+        ! @"Grading: one point per correctly filled-in type checking step."
+        ! @"Associated learning objective: \textit{type checking}."
+      ]
+    
+    CSharpTypeTrace(TextSize.Small,
+          (classDef "Point2D" 
+                    [
+                      typedDeclAndInit "x" "float" (ConstFloat(0.0)) |> makePrivate
+                      typedDeclAndInit "y" "float" (ConstFloat(0.0)) |> makePrivate
+                      typedDef "Point2D" [] "" (endProgram) |> makePublic
+                      typedDef "GetLength" [] "float" (ret (staticMethodCall "Math" "Sqrt" [(var ("this.x") .* var ("this.x")) .+ (var ("this.y") .* var ("this.y"))])) |> makePublic
+                    ] >>
+           (classDef "Point3D" 
+                    [
+                      extends "Point2D"
+                      typedDeclAndInit "z" "float" (ConstFloat(0.0)) |> makePrivate
+                      typedDef "Point3D" [] "" (endProgram) |> makePublic
+                      typedDef "GetLength" [] "float" (ret (staticMethodCall "Math" "Sqrt" [(var ("this.x") .* var ("this.x")) .+ ((var ("this.y") .* var ("this.y")) .+ (var ("this.z") .* var ("this.z")))])) |> makePublic
+                    ] >>
+            (dots >> 
+             (typedDeclAndInit "point2D" "Point2d" (newC "Point3D" []) >>
+              endProgram)))),
+
+          TypeCheckingState.Zero, false)
   ]
 
 let exam2 =
@@ -49,43 +80,51 @@ let exam2 =
         ! @"Associated learning objective: \textit{abstraction}."
       ]
     CSharpStateTrace(TextSize.Small,
-          ((interfaceDef "Animal" 
-              [
-                typedSig "makeSound" [] "void"
-              ]) >>
-             ((((classDef "Dog" 
-                  [
-                    implements "Animal"
-                    typedDef "Dog" [] "" (endProgram) |> makePublic
-                    typedDef "makeSound" [] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Woof!"]) |> makePublic
-                  ]) >>
-                (classDef "Cat" 
-                  [
-                    implements "Animal"
-                    typedDef "Cat" [] "" (endProgram) |> makePublic
-                    typedDef "makeSound" [] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Miao!"]) |> makePublic
-                  ])) >>
-                (((typedDeclAndInit "myAnimal" "Animal" (newC "Cat" [])) >>
-                     (methodCall "myAnimal" "makeSound" [])) >> 
-                      endProgram)))),
+          (interfaceDef "Animal" 
+                        [
+                          typedSig "makeSound" [] "void"
+                        ] >>
+           (classDef "Dog" 
+                    [
+                      implements "Animal"
+                      typedDef "Dog" [] "" (endProgram) |> makePublic
+                      typedDef "makeSound" [] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Woof!"]) |> makePublic
+                    ] >>
+            (classDef "Cat" 
+                    [
+                      implements "Animal"
+                      typedDef "Cat" [] "" (endProgram) |> makePublic
+                      typedDef "makeSound" [] "void" (staticMethodCall "Console" "WriteLine" [ConstString "Miao!"]) |> makePublic
+                    ] >>
+             (typedDeclAndInit "myAnimal" "Animal" (newC "Cat" []) >>
+              (methodCall "myAnimal" "makeSound" [] >> 
+               endProgram))))),
           Runtime.RuntimeState<_>.Zero (constInt 1))
+    Section("Question 2")
+    TextBlock @"Given the following block of code, fill in the declarations, class definitions, and PC with all steps taken by the compiler while type checking."
 
+    ItemsBlock
+      [
+        ! @"Points: \textit{4 (50\% of total).}"
+        ! @"Grading: one point per correctly filled-in type checking step."
+        ! @"Associated learning objective: \textit{type checking}."
+      ]
     CSharpTypeTrace(TextSize.Small,
           (classDef "Employee" 
                     [
-                      typedDeclAndInit "name" "string" (ConstFloat(3.14)) |> makePrivate
+                      typedDecl "name" "string"  |> makePrivate
                       typedDef "Employee" [] "" (endProgram) |> makePublic
                       typedDef "GetName" [] "string" (ret (var"this.name") ) |> makePublic
                     ] >>
-           classDef "Manager" 
+           (classDef "Manager" 
                     [
                       extends "Employee"
                       typedDef "Manager" [] "" (endProgram) |> makePublic
                       typedDef "GetFunction" [] "string" (ret (ConstString "I am the boss!") ) |> makePublic
                     ] >>
-           dots >> 
-           typedDeclAndInit "Employee" "employee" (newC "Manager" []) >>
-           endProgram),
+            (dots >> 
+             (typedDeclAndInit "Employee" "employee" (newC "Manager" []) >>
+              endProgram)))),
 
           TypeCheckingState.Zero, false)
   ]
