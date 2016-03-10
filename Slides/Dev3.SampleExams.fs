@@ -48,25 +48,31 @@ let exam3 =
       ]
     
     CSharpTypeTrace(TextSize.Small,
-          (classDef "Point2D" 
+          (interfaceDef "IntList" 
+                        [
+                          typedSig "isEmpty" [] "bool"
+                          typedSig "getValue" [] "int"
+                        ]) >>
+           (classDef "IntNode"
                     [
-                      typedDeclAndInit "x" "float" (ConstFloat(0.0)) |> makePrivate
-                      typedDeclAndInit "y" "float" (ConstFloat(0.0)) |> makePrivate
-                      typedDef "Point2D" [] "" (endProgram) |> makePublic
-                      typedDef "GetLength" [] "float" (ret (staticMethodCall "Math" "Sqrt" [(var ("this.x") .* var ("this.x")) .+ (var ("this.y") .* var ("this.y"))])) |> makePublic
+                      extends "IntList"
+                      typedDecl "value" "int" |> makePrivate
+                      typedDecl "tail" "IntList" |> makePrivate
+                      typedDef "IntNode" [("int", "value"); ("IntList", "tail")] "" (("this.value" := var "value") >> ("this.tail" := var "tail") ) |> makePublic
+                      typedDef "isEmpty" [] "bool" (ret (ConstBool(false))) |> makePublic
+                      typedDef "getValue" [] "int" (ret (var ("this.value"))) |> makePublic
                     ] >>
-           (classDef "Point3D" 
+            (classDef "IntEmpty"
                     [
-                      extends "Point2D"
-                      typedDeclAndInit "z" "float" (ConstFloat(0.0)) |> makePrivate
-                      typedDef "Point3D" [] "" (endProgram) |> makePublic
-                      typedDef "GetLength" [] "float" (ret (staticMethodCall "Math" "Sqrt" [(var ("this.x") .* var ("this.x")) .+ ((var ("this.y") .* var ("this.y")) .+ (var ("this.z") .* var ("this.z")))])) |> makePublic
+                      extends "IntList"
+                      typedDef "IntEmpty" [] "" (endProgram) |> makePublic
+                      typedDef "isEmpty" [] "bool" (ret (ConstBool(true))) |> makePublic
+                      typedDef "getValue" [] "int" (ret (ConstInt(0))) |> makePublic
                     ] >>
-            (dots >> 
-             (typedDeclAndInit "point2D" "Point2d" (newC "Point3D" []) >>
-              endProgram)))),
-
-          TypeCheckingState.Zero, false)
+             (dots >> 
+              (typedDeclAndInit "list" "IntList" (newC "IntNode" [(constInt(5));(newC "IntEmpty" [])]) >>
+               endProgram)))),
+           TypeCheckingState.Zero, false)
   ]
 
 let exam2 =
