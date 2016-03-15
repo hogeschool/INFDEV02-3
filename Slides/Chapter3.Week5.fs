@@ -153,8 +153,8 @@ let slides =
         CSharpCodeBlock(TextSize.Small,
           genericClassDef ["T"; "U"] "Pair" 
             [
-              typedDecl "T" "x" |> makePrivate
-              typedDecl "U" "y" |> makePrivate
+              typedDecl "x" "T" |> makePrivate
+              typedDecl "y" "U" |> makePrivate
               typedDef "Pair" ["T","x"; "U","y"] "" (("this.x" := var"x") >> ("this.y" := var"y") >> endProgram) |> makePublic
               typedDef "First" [] "T" (ret (var "this.x")) |> makePublic
               typedDef "Second" [] "U" (ret (var "this.y")) |> makePublic
@@ -165,11 +165,11 @@ let slides =
       [
         TextBlock @"We can then use this class by specifying what the types of its fields are concretely:"
 
-        CSharpCodeBlock(TextSize.Small,
+        CSharpCodeBlock(TextSize.Tiny,
           genericClassDef ["T"; "U"] "Pair" 
             [
-              typedDecl "T" "x" |> makePrivate
-              typedDecl "U" "y" |> makePrivate
+              typedDecl "x" "T" |> makePrivate
+              typedDecl "y" "U" |> makePrivate
               typedDef "Pair" ["T","x"; "U","y"] "" (("this.x" := var"x") >> ("this.y" := var"y") >> endProgram) |> makePublic
               typedDef "First" [] "T" (ret (var "this.x")) |> makePublic
               typedDef "Second" [] "U" (ret (var "this.y")) |> makePublic
@@ -180,11 +180,11 @@ let slides =
           endProgram)
       ]
 
-    CSharpStateTrace(TextSize.Small,
+    CSharpStateTrace(TextSize.Tiny,
       genericClassDef ["T"; "U"] "Pair" 
         [
-          typedDecl "T" "x" |> makePrivate
-          typedDecl "U" "y" |> makePrivate
+          typedDecl "x" "T" |> makePrivate
+          typedDecl "y" "U" |> makePrivate
           typedDef "Pair" ["T","x"; "U","y"] "" (("this.x" := var"x") >> ("this.y" := var"y") >> endProgram) |> makePublic
           typedDef "First" [] "T" (ret (var "this.x")) |> makePublic
           typedDef "Second" [] "U" (ret (var "this.y")) |> makePublic
@@ -194,11 +194,20 @@ let slides =
       staticMethodCall "Console" "WriteLine" [methodCall "p" "Second" []] >>
       endProgram, RuntimeState<_>.Zero (constInt 1))
 
+    ItemsBlock
+      [
+        ! @"In Java, generic arguments cannot be all those primitive types with non-reference values that sit directly on the stack"
+        ! @"This means that we cannot write \texttt{Pair<int,int>} in Java"
+        ! @"The standard library contains \textbf{reference versions} of those types, starting with a capital letter, such as \texttt{Integer}, etc."
+        ! @"Those types are like the primitive types, but their values are references that point to the actual value on the heap"
+        ! @"We can then write \texttt{Pair<Integer,Integer}"
+      ]
+
     VerticalStack
       [
         TextBlock @"The types of the fields can change, but the class implementation always remains the same:"
 
-        CSharpCodeBlock(TextSize.Small,
+        CSharpCodeBlock(TextSize.Tiny,
           genericTypedDeclAndInit ["int"; "bool"] "p" "Pair" (genericNewC "Pair" ["int"; "bool"] [constInt 10; constBool true]) >>
           genericTypedDeclAndInit ["float"; "bool"] "p" "Pair" (genericNewC "Pair" ["float"; "bool"] [constFloat 10.0; constBool false]) >>
           genericTypedDeclAndInit ["bool"; "bool"] "p" "Pair" (genericNewC "Pair" ["bool"; "bool"] [constBool false; constBool true]) >>
@@ -215,23 +224,23 @@ let slides =
         ! @"The created class has the concrete versions of these parameters in it"
       ]
 
-    CSharpTypeTrace(TextSize.Small,
+    CSharpTypeTrace(TextSize.Tiny,
       genericClassDef ["T"; "U"] "Pair" 
         [
-          typedDecl "T" "x" |> makePrivate
-          typedDecl "U" "y" |> makePrivate
+          typedDecl "x" "T" |> makePrivate
+          typedDecl "y" "U" |> makePrivate
           typedDef "Pair" ["T","x"; "U","y"] "" (("this.x" := var"x") >> ("this.y" := var"y") >> endProgram) |> makePublic
           typedDef "First" [] "T" (ret (var "this.x")) |> makePublic
           typedDef "Second" [] "U" (ret (var "this.y")) |> makePublic
         ] >> 
       genericTypedDeclAndInit ["int"; "bool"] "p" "Pair" (genericNewC "Pair" ["int"; "bool"] [constInt 10; constBool true]) >>
-      endProgram, TypeCheckingState.Zero, false)
+      endProgram, TypeCheckingState.Zero, true)
 
     VerticalStack
       [
         TextBlock "This means that the compiler would actually generate code that behaves like the following:"
 
-        CSharpCodeBlock(TextSize.Small,
+        CSharpCodeBlock(TextSize.Tiny,
           classDef "PairIntBool" 
             [
               typedDecl "int" "x" |> makePrivate
@@ -253,9 +262,9 @@ let slides =
 
     VerticalStack
       [
-        TextBlock "This means that the compiler would actually generate code that behaves like the following:"
+        TextBlock "We can define a generic interface as follows:"
 
-        CSharpCodeBlock(TextSize.Small,
+        CSharpCodeBlock(TextSize.Tiny,
           genericInterfaceDef ["T"; "U"] "IPair" 
             [
               typedDecl "T" "x" |> makePrivate
@@ -264,6 +273,15 @@ let slides =
               typedDef "First" [] "T" (ret (var "this.x")) |> makePublic
               typedDef "Second" [] "U" (ret (var "this.y")) |> makePublic
             ] >> 
+          endProgram)
+      ]
+
+    VerticalStack
+      [
+        TextBlock "The generic interface can then be implemented by a class (generic or not) as follows:"
+
+        CSharpCodeBlock(TextSize.Tiny,
+          dots >>
           genericClassDef ["T"; "U"] "Pair" 
             [
               implements "IPair"
@@ -276,6 +294,7 @@ let slides =
           genericTypedDeclAndInit ["int"; "bool"] "p" "IPair" (genericNewC "Pair" ["int"; "bool"] [constInt 10; constBool true]) >>
           endProgram)
       ]
+
 
     Section @"Generic lists: a concrete example"
     SubSection "Ingredients"
@@ -333,13 +352,13 @@ let slides =
 
         CSharpCodeBlock(TextSize.Small,
           genericLambdaFuncDecl "int" "int" "f" "x" (ret (var"x" .+ constInt 2)) >>
-          staticMethodCall "Console" "WriteLine" [genericLambdaFuncCall "f" (constInt 10)] >>
-          endProgram)
+          staticMethodCall "Console" "WriteLine" [genericLambdaFuncCall "f" [constInt 10]] >>
+          endProgram) |> Unrepeated
       ]
 
     CSharpStateTrace(TextSize.Small,
       genericLambdaFuncDecl "int" "int" "f" "x" (ret (var"x" .+ constInt 2)) >>
-      staticMethodCall "Console" "WriteLine" [genericLambdaFuncCall "f" (constInt 10)] >>
+      staticMethodCall "Console" "WriteLine" [genericLambdaFuncCall "f" [constInt 10]] >>
       endProgram, RuntimeState<_>.Zero (constInt 1))
 
     TextBlock @"Live coding demo: generic lists with map, filter, and fold."

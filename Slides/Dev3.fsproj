@@ -67,8 +67,9 @@
     <Compile Include="Program.fs" />
     <None Include="INFDEV02_3_Lec1_OO_intro.pdf" />
     <None Include="INFDEV02_3_Lec2_Static_typing.pdf" />
-    <None Include="INFDEV02_3_Lec3_Polymorphism.pdf" />
     <None Include="INFDEV02_3_Lec4_Generics.pdf" />
+    <None Include="INFDEV02_3_Lec3_Polymorphism.pdf" />
+    <None Include="INFDEV02_3_Lec5_PatternsAndPractices.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
