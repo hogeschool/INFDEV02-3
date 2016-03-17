@@ -129,7 +129,7 @@ let exam2 =
                       typedDef "GetFunction" [] "string" (ret (ConstString "I am the boss!") ) |> makePublic
                     ] >>
             (dots >> 
-             (typedDeclAndInit "Employee" "employee" (newC "Manager" []) >>
+             (typedDeclAndInit "employee" "Employee" (newC "Manager" []) >>
               endProgram)))),
 
           TypeCheckingState.Zero, false)
