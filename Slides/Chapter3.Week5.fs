@@ -200,7 +200,7 @@ let slides =
         ! @"This means that we cannot write \texttt{Pair<int,int>} in Java"
         ! @"The standard library contains \textbf{reference versions} of those types, starting with a capital letter, such as \texttt{Integer}, etc."
         ! @"Those types are like the primitive types, but their values are references that point to the actual value on the heap"
-        ! @"We can then write \texttt{Pair<Integer,Integer}"
+        ! @"We can then write \texttt{Pair<Integer,Integer>}"
       ]
 
     VerticalStack
@@ -267,11 +267,8 @@ let slides =
         CSharpCodeBlock(TextSize.Tiny,
           genericInterfaceDef ["T"; "U"] "IPair" 
             [
-              typedDecl "T" "x" |> makePrivate
-              typedDecl "U" "y" |> makePrivate
-              typedDef "Pair" ["T","x"; "U","y"] "" (("this.x" := var"x") >> ("this.y" := var"y") >> endProgram) |> makePublic
-              typedDef "First" [] "T" (ret (var "this.x")) |> makePublic
-              typedDef "Second" [] "U" (ret (var "this.y")) |> makePublic
+              typedSig "First" [] "T"
+              typedSig "Second" [] "U"
             ] >> 
           endProgram)
       ]
@@ -284,7 +281,7 @@ let slides =
           dots >>
           genericClassDef ["T"; "U"] "Pair" 
             [
-              implements "IPair"
+              implements "IPair<T,U>"
               typedDecl "T" "x" |> makePrivate
               typedDecl "U" "y" |> makePrivate
               typedDef "Pair" ["T","x"; "U","y"] "" (("this.x" := var"x") >> ("this.y" := var"y") >> endProgram) |> makePublic
