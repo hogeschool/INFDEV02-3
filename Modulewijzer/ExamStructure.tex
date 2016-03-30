@@ -84,7 +84,7 @@ Heap:
 		PC & ... & & PC & ret \\
 		\hline
 		13 & ...
-		& & 7 & null \\
+		& & 7 & ref 1 \\
 		\hline
 		
 	\end{tabular}
@@ -137,7 +137,7 @@ Heap:
 		PC & ... & & PC & ret \\
 		\hline
 		14 & ...
-		& & 10 & null \\
+		& & 10 & ref 1 \\
 		\hline
 		
 	\end{tabular}
@@ -288,7 +288,7 @@ c.Incr(5);
 		\hline
 		PC & c \\
 		\hline
-		14 & Counter \\
+		14 & ICounter \\
 		\hline
 		
 	\end{tabular}
@@ -305,7 +305,7 @@ c.Incr(5);
 		\hline
 		c & & PC & ret & $arg_1$ & this \\
 		\hline
-		Counter & & 14 & null & int & Counter \\
+		ICounter & & 14 & null & int & Counter \\
 		\hline
 		
 	\end{tabular}
@@ -322,7 +322,7 @@ c.Incr(5);
 		\hline
 		c & & PC & ret & $arg_1$ & this \\
 		\hline
-		Counter & & 14 & void & int & Counter \\
+		ICounter & & 14 & void & int & Counter \\
 		\hline
 		
 	\end{tabular}
@@ -339,7 +339,7 @@ c.Incr(5);
 		\hline
 		PC & c \\
 		\hline
-		15 & Counter \\
+		15 & ICounter \\
 		\hline
 		
 	\end{tabular}
