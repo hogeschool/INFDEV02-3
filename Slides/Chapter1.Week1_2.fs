@@ -32,8 +32,8 @@ let slides =
     ItemsBlock
       [
         !"written exam"
-        !"4 open questions"
-        !"code, type system, and semantics"
+        !"2 open questions"
+        !"code and type system"
         !(@"no grade: go (score$\ge$75) or no go (otherwise)")
       ]
 
@@ -49,17 +49,17 @@ let slides =
     ItemsBlock
       [
         !"a connected series of programming tasks"
-        !"build a simulation similar to that of DEV2"
+        !"build a simulation"
         !"use the additional structure and help offered by static typing and object orientation"
         !(@"\textbf{mandatory}, but with no direct grade")
       ]
 
-    SubSection("Oral")
+    SubSection("Practicum check")
     ItemsBlock
       [
-        !"the oral is entirely based on the assignments"
+        !"the practicum check is entirely based on the assignments"
         !"we remove some pieces of code from the working solutions and you fill them back in"
-        !"the oral gives you the final grade for the course"
+        !"the practicum gives you the final grade for the course"
       ]
 
     SubSection("Expected study effort")
@@ -195,7 +195,7 @@ let slides =
       TextBlock @"Each primitive data type has a different range and uses more or less memory"
 
       ItemsBlock[ 
-        ! @"\texttt{byte} is 1 byte, and it goes from -128 to 127"
+        ! @"\texttt{sbyte} is 1 byte, and it goes from -128 to 127"
         ! @"\texttt{short} is 2 bytes, and it goes from -32,768 to 32,767"
         ! @"\texttt{int} is 4 bytes, and it goes from $-2^{31}$ to $2^{31}-1$"
         ! @"\texttt{float} is 4 bytes, and it has a very wide range \textbf{with non-uniform steps between adjacent values!}$"
@@ -212,7 +212,7 @@ let slides =
       ItemsBlock[ 
         ! @"Python operators translate almost directly to Java/C\#"
         ! @"Only exception are the logical operators"
-        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($\|\|$), and \texttt{and} becomes (\&\&)"
+        ! @"\texttt{not} becomes (!), \texttt{or} becomes ($||$), and \texttt{and} becomes (\&\&)"
       ]
 
       PythonCodeBlock(TextSize.Small,
