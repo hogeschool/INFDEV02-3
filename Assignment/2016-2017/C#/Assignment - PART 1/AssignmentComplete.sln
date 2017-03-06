@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssignmentComplete", "AssignmentComplete\AssignmentComplete.csproj", "{71BA39BA-984E-4CCE-A80C-1AADCA36927B}"
 EndProject
@@ -14,6 +14,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{71BA39BA-984E-4CCE-A80C-1AADCA36927B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{71BA39BA-984E-4CCE-A80C-1AADCA36927B}.Debug|Any CPU.Build.0 = Debug|x86
 		{71BA39BA-984E-4CCE-A80C-1AADCA36927B}.Debug|x86.ActiveCfg = Debug|x86
 		{71BA39BA-984E-4CCE-A80C-1AADCA36927B}.Debug|x86.Build.0 = Debug|x86
 		{71BA39BA-984E-4CCE-A80C-1AADCA36927B}.Release|Any CPU.ActiveCfg = Release|x86
