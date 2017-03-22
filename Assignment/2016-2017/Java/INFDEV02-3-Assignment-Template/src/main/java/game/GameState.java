@@ -24,8 +24,8 @@ public class GameState implements IComponent {
         this.background = background;
 
         factories = new ArrayList<>();
-        factories.add(null /* new MiningFactory(new Point2D(100, 70), new Dimension2D(150, 230 / 2), new Point2D(100, 0), new Point2D(5, 0), mine, oreContainer, mineCart, volvo) */ );
-        factories.add(null /* new IkeaFactory(new Point2D(600, 340), new Dimension2D(150, 175 / 2), new Point2D(-100, 0), new Point2D(-4, 0), ikea, productContainer, productBox, volvo) */);
+//        factories.add(new MiningFactory(new Point2D(100, 70), new Dimension2D(150, 230 / 2), new Point2D(100, 0), new Point2D(5, 0), mine, oreContainer, mineCart, volvo));
+//        factories.add(new IkeaFactory(new Point2D(600, 340), new Dimension2D(150, 175 / 2), new Point2D(-100, 0), new Point2D(-4, 0), ikea, productContainer, productBox, volvo));
 
         trucks = new ArrayList<>();
         this.processes = new ArrayList<>();
